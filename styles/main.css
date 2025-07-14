@@ -156,6 +156,7 @@ body {
   justify-content: center;
   gap: 1.2rem;
   margin-bottom: 1.5rem;
+  margin-top: 2.5rem; /* Lower the tabs visually */
 }
 .nav-btn {
   background: rgba(60, 40, 100, 0.45);
