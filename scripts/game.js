@@ -135,6 +135,10 @@ function prestige() {
   // Reset all upgrade levels for each upgrade in CLICKER_UPGRADES
   CLICKER_UPGRADES.forEach(upg => {
     clickerUpgrades[upg.id + 'Level'] = 0;
+    // If the upgrade affects a stat (like clickValue), reset it to its base effect
+    if (upg.id === 'click-value') {
+      clickerUpgrades.clickValue = upg.effect(0);
+    }
   });
 
   // Clear previous save to ensure no old data is reloaded
