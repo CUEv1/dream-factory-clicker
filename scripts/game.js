@@ -46,12 +46,13 @@ function createStar() {
 function animateStars() {
   for (let s of stars) {
     let top = parseFloat(s.el.style.top);
-    top += s.speed;
+    top += s.speed * starfieldSpeed; // Apply speed multiplier
     if (top > 100) top = 0;
     s.el.style.top = `${top}%`;
   }
-  // Slow down the animation frame rate for gentler movement
-  setTimeout(() => requestAnimationFrame(animateStars), 50); // 20 FPS instead of 60 FPS
+  // Adjust frame rate based on speed
+  const frameDelay = starfieldSpeed === 0 ? 1000 : Math.max(50, 100 - (starfieldSpeed * 50));
+  setTimeout(() => requestAnimationFrame(animateStars), frameDelay);
 }
 
 function initStarfield() {
@@ -539,6 +540,7 @@ function saveGame() {
     soundVolume,
     musicVolume,
     menuVolume,
+    starfieldSpeed,
     lastSaveTime: Date.now()
   };
   
@@ -568,6 +570,8 @@ function loadGame() {
       soundVolume = saveData.soundVolume !== undefined ? saveData.soundVolume : 0.7;
       musicVolume = saveData.musicVolume !== undefined ? saveData.musicVolume : 0.4;
       menuVolume = saveData.menuVolume !== undefined ? saveData.menuVolume : 0.5;
+      starfieldSpeed = saveData.starfieldSpeed !== undefined ? saveData.starfieldSpeed : 0.5;
+      starfieldSpeed = saveData.starfieldSpeed !== undefined ? saveData.starfieldSpeed : 0.5;
       
       // Ensure all generators exist in state
       GENERATORS.forEach(gen => {
@@ -597,6 +601,7 @@ function exportSaveData() {
     soundVolume,
     musicVolume,
     menuVolume,
+    starfieldSpeed,
     exportTime: Date.now()
   };
   return btoa(JSON.stringify(saveData)); // Base64 encode
@@ -688,6 +693,7 @@ let musicEnabled = true;
 let soundVolume = 0.7;
 let musicVolume = 0.4;
 let menuVolume = 0.5;
+let starfieldSpeed = 0.5; // 0.0 = static, 1.0 = original speed
 
 function playSound(name) {
   if (soundEnabled && SOUNDS[name]) {
@@ -905,6 +911,13 @@ function renderSettingsScreen() {
             <button class="mute-btn" id="menu-mute">Mute</button>
           </div>
         </div>
+        <div class="setting-item">
+          <div class="volume-control">
+            <span class="volume-label">Starfield Speed:</span>
+            <input type="range" id="starfield-speed" min="0" max="1" step="0.01" value="${starfieldSpeed}" />
+            <span class="volume-display" id="starfield-speed-display">${Math.round(starfieldSpeed * 100)}%</span>
+          </div>
+        </div>
       </div>
       <div class="settings-section">
         <h3>Save & Load</h3>
@@ -960,6 +973,13 @@ function renderSettingsScreen() {
     updateMenuVolume(volume);
     e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
     saveGame(); // Save immediately when volume changes
+  });
+
+  // Starfield speed slider event listener
+  document.getElementById('starfield-speed').addEventListener('input', e => {
+    starfieldSpeed = parseFloat(e.target.value);
+    document.getElementById('starfield-speed-display').textContent = Math.round(starfieldSpeed * 100) + '%';
+    saveGame();
   });
   
   // Mute button event listeners
