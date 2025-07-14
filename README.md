@@ -51,4 +51,4 @@ dream-factory/
 - Place a custom orb cursor image (e.g., `cursor-orb.png`) in `assets/images/` for the Dream Orb hover effect.
 - Add the `Orbitron.ttf` and `Comfortaa.ttf` font files to `assets/fonts/` for the best visual experience.
 
-Enjoy building your Dream Factory! 
+Enjoy building your Dream Factory!
