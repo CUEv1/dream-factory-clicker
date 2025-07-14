@@ -127,7 +127,7 @@ function prestige() {
   updateEnergyCounter();
   renderCurrentScreen();
 
-  // Now create the particles, anchored to the orb
+  // Now create the particles, anchored to the prestige section
   createPrestigeParticles();
 
   playSound('prestige');
@@ -139,9 +139,17 @@ function prestige() {
 }
 
 function createPrestigeParticles() {
-  const orb = document.getElementById('dream-orb');
-  if (!orb) return;
-  const orbRect = orb.getBoundingClientRect();
+  // Anchor to the center of the prestige-section on the Lucidity screen
+  const prestigeSection = document.querySelector('.prestige-section');
+  if (!prestigeSection) return;
+  const sectionRect = prestigeSection.getBoundingClientRect();
+
+  // Add scroll position to coordinates
+  const scrollX = window.scrollX || window.pageXOffset;
+  const scrollY = window.scrollY || window.pageYOffset;
+
+  const centerX = sectionRect.left + sectionRect.width / 2 + scrollX;
+  const centerY = sectionRect.top + sectionRect.height / 2 + scrollY;
 
   const particles = document.createElement('div');
   particles.className = 'prestige-particles';
@@ -149,10 +157,6 @@ function createPrestigeParticles() {
   for (let i = 0; i < 20; i++) {
     const particle = document.createElement('div');
     particle.className = 'prestige-particle';
-
-    // Center of the orb
-    const centerX = orbRect.left + orbRect.width / 2;
-    const centerY = orbRect.top + orbRect.height / 2;
 
     // Random angle and distance
     const angle = (Math.PI * 2 * i) / 20;
