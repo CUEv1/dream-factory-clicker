@@ -559,12 +559,153 @@ setInterval(saveGame, AUTO_SAVE_INTERVAL);
 // Save on page unload
 window.addEventListener('beforeunload', saveGame);
 
-// Load game on startup
+// --- Sound System ---
+const SOUNDS = {
+  click: new Audio('assets/sounds/click.mp3'),
+  purchase: new Audio('assets/sounds/purchase.mp3'),
+  prestige: new Audio('assets/sounds/prestige.mp3'),
+  ambient: new Audio('assets/sounds/ambient.mp3'),
+};
+SOUNDS.ambient.loop = true;
+SOUNDS.ambient.volume = 0.4;
+
+let soundEnabled = true;
+let musicEnabled = true;
+
+function playSound(name) {
+  if (soundEnabled && SOUNDS[name]) {
+    SOUNDS[name].currentTime = 0;
+    SOUNDS[name].play();
+  }
+}
+
+function playMusic() {
+  if (musicEnabled) {
+    SOUNDS.ambient.volume = 0.4;
+    SOUNDS.ambient.play();
+  }
+}
+function stopMusic() {
+  SOUNDS.ambient.pause();
+  SOUNDS.ambient.currentTime = 0;
+}
+
+// --- Integrate sounds into game actions ---
+// Update click sound
+function onOrbClick(e) {
+  const clickValue = Math.floor(1 * getLucidityMultiplier());
+  dreamEnergy += clickValue;
+  updateEnergyCounter();
+  showFloatingNumber(e, clickValue);
+  playSound('click');
+}
+
+// Play purchase/upgrade sound
+function purchaseGenerator(id) {
+  const cost = getGeneratorCost(id);
+  if (dreamEnergy >= cost) {
+    dreamEnergy -= cost;
+    generatorState[id].count++;
+    updateEnergyCounter();
+    renderGeneratorsScreen();
+    playSound('purchase');
+  }
+}
+function upgradeGenerator(id) {
+  const gen = GENERATORS.find(g => g.id === id);
+  const state = generatorState[id];
+  const upgradeCost = Math.floor(gen.baseCost * 5 * Math.pow(2, state.level));
+  if (dreamEnergy >= upgradeCost && state.level < 10) {
+    dreamEnergy -= upgradeCost;
+    state.level++;
+    updateEnergyCounter();
+    renderGeneratorsScreen();
+    playSound('purchase');
+  }
+}
+// Play prestige sound
+function prestige() {
+  if (!canPrestige()) return;
+  const lucidityGain = calculateLucidityGain();
+  lucidityPoints += lucidityGain;
+  totalPrestiges++;
+  dreamEnergy = 0;
+  GENERATORS.forEach(gen => {
+    generatorState[gen.id] = { count: 0, level: 1 };
+  });
+  updateEnergyCounter();
+  renderCurrentScreen();
+  playSound('prestige');
+}
+
+// --- Settings Screen: Add sound/music toggles ---
+function renderSettingsScreen() {
+  const app = document.getElementById('app-root');
+  app.innerHTML = `
+    <div class="settings-screen glass">
+      <h2>Settings</h2>
+      <div class="settings-section">
+        <h3>Audio</h3>
+        <div class="setting-item">
+          <label>Sound Effects:</label>
+          <input type="checkbox" id="sound-toggle" ${soundEnabled ? 'checked' : ''} />
+        </div>
+        <div class="setting-item">
+          <label>Background Music:</label>
+          <input type="checkbox" id="music-toggle" ${musicEnabled ? 'checked' : ''} />
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>Save & Load</h3>
+        <div class="setting-item">
+          <label>Auto-save every 30 seconds</label>
+          <div class="status-indicator">✓ Active</div>
+        </div>
+        <div class="setting-item">
+          <button class="export-btn" onclick="exportSave()">Export Save Data</button>
+          <p class="setting-desc">Copy this string to backup your progress</p>
+        </div>
+        <div class="setting-item">
+          <label>Import Save Data:</label>
+          <input type="text" id="import-input" placeholder="Paste save data here..." />
+          <button class="import-btn" onclick="importSave()">Import</button>
+        </div>
+        <div class="setting-item">
+          <button class="reset-btn" onclick="resetGame()">Reset Game</button>
+          <p class="setting-desc warning">⚠️ This will permanently delete all progress!</p>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>Game Info</h3>
+        <div class="setting-item">
+          <span>Version:</span>
+          <span>1.0.0</span>
+        </div>
+        <div class="setting-item">
+          <span>Last Save:</span>
+          <span id="last-save-time">${new Date().toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+  `;
+  // Add event listeners for toggles
+  document.getElementById('sound-toggle').addEventListener('change', e => {
+    soundEnabled = e.target.checked;
+    if (soundEnabled) playSound('click');
+  });
+  document.getElementById('music-toggle').addEventListener('change', e => {
+    musicEnabled = e.target.checked;
+    if (musicEnabled) playMusic();
+    else stopMusic();
+  });
+}
+
+// Start music on load if enabled
 window.addEventListener('DOMContentLoaded', () => {
   const loaded = loadGame();
   initStarfield();
   renderCurrentScreen();
-  
+  if (musicEnabled) playMusic();
   if (loaded) {
     console.log('Previous save found and loaded');
   } else {
