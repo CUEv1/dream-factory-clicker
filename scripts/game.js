@@ -305,6 +305,9 @@ function renderGeneratorsScreen() {
         ${GENERATORS.map(gen => {
           const state = generatorState[gen.id];
           const animation = GENERATOR_ANIMATIONS[gen.id];
+          const currentProduction = getGeneratorProduction(gen.id);
+          const nextProduction = gen.baseProduction * (state.count + 1) * Math.pow(1.15, state.level - 1);
+          const productionIncrease = nextProduction - currentProduction;
           return `<div class="generator-card ${animation.class}" style="--gen-color:${gen.color}">
             <div class="gen-animation-container">
               ${animation.svg}
@@ -313,7 +316,8 @@ function renderGeneratorsScreen() {
               <div class="gen-name">${gen.name}</div>
               <div class="gen-desc">${gen.description}</div>
               <div class="gen-owned">Owned: <b>${state.count}</b></div>
-              <div class="gen-prod">Production: <b>${(getGeneratorProduction(gen.id)).toFixed(2)}</b>/sec</div>
+              <div class="gen-prod">Production: <b>${currentProduction.toFixed(2)}</b>/sec</div>
+              <div class="gen-preview">Next purchase: <b>+${productionIncrease.toFixed(2)}</b>/sec</div>
               <button class="gen-buy-btn" data-id="${gen.id}">Buy<br><span>${getGeneratorCost(gen.id)}</span></button>
               <button class="gen-upg-btn" data-id="${gen.id}" ${state.level>=10?'disabled':''}>Upgrade<br><span>${state.level<10?getGeneratorUpgradeCost(gen.id):'Max'}</span></button>
               <div class="gen-level">Level: <b>${state.level}</b>/10</div>
@@ -339,6 +343,9 @@ function updateGeneratorsDisplay() {
     generatorList.innerHTML = GENERATORS.map(gen => {
       const state = generatorState[gen.id];
       const animation = GENERATOR_ANIMATIONS[gen.id];
+      const currentProduction = getGeneratorProduction(gen.id);
+      const nextProduction = gen.baseProduction * (state.count + 1) * Math.pow(1.15, state.level - 1);
+      const productionIncrease = nextProduction - currentProduction;
       return `<div class="generator-card ${animation.class}" style="--gen-color:${gen.color}">
         <div class="gen-animation-container">
           ${animation.svg}
@@ -347,7 +354,8 @@ function updateGeneratorsDisplay() {
           <div class="gen-name">${gen.name}</div>
           <div class="gen-desc">${gen.description}</div>
           <div class="gen-owned">Owned: <b>${state.count}</b></div>
-          <div class="gen-prod">Production: <b>${(getGeneratorProduction(gen.id)).toFixed(2)}</b>/sec</div>
+          <div class="gen-prod">Production: <b>${currentProduction.toFixed(2)}</b>/sec</div>
+          <div class="gen-preview">Next purchase: <b>+${productionIncrease.toFixed(2)}</b>/sec</div>
           <button class="gen-buy-btn" data-id="${gen.id}">Buy<br><span>${getGeneratorCost(gen.id)}</span></button>
           <button class="gen-upg-btn" data-id="${gen.id}" ${state.level>=10?'disabled':''}>Upgrade<br><span>${state.level<10?getGeneratorUpgradeCost(gen.id):'Max'}</span></button>
           <div class="gen-level">Level: <b>${state.level}</b>/10</div>

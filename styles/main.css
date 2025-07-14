@@ -228,9 +228,14 @@ body {
   opacity: 0.8;
   margin-bottom: 0.3em;
 }
-.gen-owned, .gen-prod, .gen-level {
+.gen-owned, .gen-prod, .gen-level, .gen-preview {
   font-size: 0.95em;
   margin-bottom: 0.2em;
+}
+
+.gen-preview {
+  color: #7fffd4;
+  font-weight: 500;
 }
 .gen-buy-btn, .gen-upg-btn {
   background: linear-gradient(90deg, var(--gen-color, #a7c7ff) 60%, #fff3 100%);
