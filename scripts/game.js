@@ -132,7 +132,7 @@ function prestige() {
   
   // Play prestige sound with reduced volume
   if (soundEnabled) {
-    SOUNDS.prestige.volume = soundVolume * 0.1; // 50% of normal volume
+    SOUNDS.prestige.volume = soundVolume * 0.25; // 25% of SFX volume
     SOUNDS.prestige.play();
   }
   
@@ -919,6 +919,8 @@ function playSound(name) {
       SOUNDS[name].volume = musicVolume;
     } else if (name === 'menu') {
       SOUNDS[name].volume = menuVolume;
+    } else if (name === 'prestige') {
+      SOUNDS[name].volume = soundVolume * 0.25; // 25% of SFX volume
     } else {
       SOUNDS[name].volume = soundVolume;
     }
