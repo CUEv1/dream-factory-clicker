@@ -46,12 +46,12 @@ function createStar() {
 function animateStars() {
   for (let s of stars) {
     let top = parseFloat(s.el.style.top);
-    top += s.speed * starfieldSpeed; // Apply speed multiplier
+    top += s.speed * starfieldSpeed; // Apply speed multiplier (now up to 2x)
     if (top > 100) top = 0;
     s.el.style.top = `${top}%`;
   }
   // Adjust frame rate based on speed
-  const frameDelay = starfieldSpeed === 0 ? 1000 : Math.max(50, 100 - (starfieldSpeed * 50));
+  const frameDelay = starfieldSpeed === 0 ? 1000 : Math.max(20, 100 - (starfieldSpeed * 40));
   setTimeout(() => requestAnimationFrame(animateStars), frameDelay);
 }
 
@@ -914,7 +914,7 @@ function renderSettingsScreen() {
         <div class="setting-item">
           <div class="volume-control">
             <span class="volume-label">Starfield Speed:</span>
-            <input type="range" id="starfield-speed" min="0" max="1" step="0.01" value="${starfieldSpeed}" />
+            <input type="range" id="starfield-speed" min="0" max="2" step="0.01" value="${starfieldSpeed}" />
             <span class="volume-display" id="starfield-speed-display">${Math.round(starfieldSpeed * 100)}%</span>
           </div>
         </div>
