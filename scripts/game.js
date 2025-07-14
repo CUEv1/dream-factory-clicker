@@ -332,6 +332,39 @@ function renderGeneratorsScreen() {
   });
 }
 
+function updateGeneratorsDisplay() {
+  // Only update the generator content without re-rendering the entire screen
+  const generatorList = document.querySelector('.generator-list');
+  if (generatorList) {
+    generatorList.innerHTML = GENERATORS.map(gen => {
+      const state = generatorState[gen.id];
+      const animation = GENERATOR_ANIMATIONS[gen.id];
+      return `<div class="generator-card ${animation.class}" style="--gen-color:${gen.color}">
+        <div class="gen-animation-container">
+          ${animation.svg}
+        </div>
+        <div class="gen-info">
+          <div class="gen-name">${gen.name}</div>
+          <div class="gen-desc">${gen.description}</div>
+          <div class="gen-owned">Owned: <b>${state.count}</b></div>
+          <div class="gen-prod">Production: <b>${(getGeneratorProduction(gen.id)).toFixed(2)}</b>/sec</div>
+          <button class="gen-buy-btn" data-id="${gen.id}">Buy<br><span>${getGeneratorCost(gen.id)}</span></button>
+          <button class="gen-upg-btn" data-id="${gen.id}" ${state.level>=10?'disabled':''}>Upgrade<br><span>${state.level<10?getGeneratorUpgradeCost(gen.id):'Max'}</span></button>
+          <div class="gen-level">Level: <b>${state.level}</b>/10</div>
+        </div>
+      </div>`;
+    }).join('');
+    
+    // Re-add event listeners
+    document.querySelectorAll('.gen-buy-btn').forEach(btn => {
+      btn.addEventListener('click', () => purchaseGenerator(btn.dataset.id));
+    });
+    document.querySelectorAll('.gen-upg-btn').forEach(btn => {
+      btn.addEventListener('click', () => upgradeGenerator(btn.dataset.id));
+    });
+  }
+}
+
 function getGeneratorUpgradeCost(id) {
   const gen = GENERATORS.find(g => g.id === id);
   const state = generatorState[id];
@@ -672,7 +705,7 @@ function purchaseGenerator(id) {
     generatorState[id].count++;
     gameStats.generatorsPurchased++;
     updateEnergyCounter();
-    renderGeneratorsScreen();
+    updateGeneratorsDisplay();
     playSound('purchase');
   }
 }
@@ -685,7 +718,7 @@ function upgradeGenerator(id) {
     state.level++;
     gameStats.upgradesPurchased++;
     updateEnergyCounter();
-    renderGeneratorsScreen();
+    updateGeneratorsDisplay();
     playSound('purchase');
   }
 }
