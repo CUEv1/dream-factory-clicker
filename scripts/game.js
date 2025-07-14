@@ -128,9 +128,11 @@ function getLucidityMultiplier() {
 function onOrbClick(e) {
   const clickValue = Math.floor(1 * getLucidityMultiplier());
   dreamEnergy += clickValue;
+  gameStats.totalClicks++;
+  gameStats.totalEnergyEarned += clickValue;
   updateEnergyCounter();
   showFloatingNumber(e, clickValue);
-  // TODO: Play click sound
+  playSound('click');
 }
 
 function updateEnergyCounter() {
@@ -676,17 +678,6 @@ function updateMenuVolume(volume) {
 }
 
 // --- Integrate sounds into game actions ---
-// Update click sound
-function onOrbClick(e) {
-  const clickValue = Math.floor(1 * getLucidityMultiplier());
-  dreamEnergy += clickValue;
-  gameStats.totalClicks++;
-  gameStats.totalEnergyEarned += clickValue;
-  updateEnergyCounter();
-  showFloatingNumber(e, clickValue);
-  playSound('click');
-}
-
 // Play purchase/upgrade sound
 function purchaseGenerator(id) {
   const cost = getGeneratorCost(id);
