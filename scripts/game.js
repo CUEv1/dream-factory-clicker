@@ -570,8 +570,7 @@ function loadGame() {
       soundVolume = saveData.soundVolume !== undefined ? saveData.soundVolume : 0.7;
       musicVolume = saveData.musicVolume !== undefined ? saveData.musicVolume : 0.4;
       menuVolume = saveData.menuVolume !== undefined ? saveData.menuVolume : 0.5;
-      starfieldSpeed = saveData.starfieldSpeed !== undefined ? saveData.starfieldSpeed : 0.5;
-      starfieldSpeed = saveData.starfieldSpeed !== undefined ? saveData.starfieldSpeed : 0.5;
+      starfieldSpeed = saveData.starfieldSpeed !== undefined ? saveData.starfieldSpeed : 1;
       
       // Ensure all generators exist in state
       GENERATORS.forEach(gen => {
@@ -623,6 +622,7 @@ function importSaveData(importString) {
     soundVolume = saveData.soundVolume !== undefined ? saveData.soundVolume : 0.7;
     musicVolume = saveData.musicVolume !== undefined ? saveData.musicVolume : 0.4;
     menuVolume = saveData.menuVolume !== undefined ? saveData.menuVolume : 0.5;
+    starfieldSpeed = saveData.starfieldSpeed !== undefined ? saveData.starfieldSpeed : 1;
     
     // Ensure all generators exist in state
     GENERATORS.forEach(gen => {
@@ -661,6 +661,7 @@ function resetGame() {
     soundVolume = 0.7;
     musicVolume = 0.4;
     menuVolume = 0.5;
+    starfieldSpeed = 1; // Reset starfield speed to default
     GENERATORS.forEach(gen => {
       generatorState[gen.id] = { count: 0, level: 1 };
     });
@@ -693,7 +694,7 @@ let musicEnabled = true;
 let soundVolume = 0.7;
 let musicVolume = 0.4;
 let menuVolume = 0.5;
-let starfieldSpeed = 0.5; // 0.0 = static, 1.0 = original speed
+let starfieldSpeed = 1; // 1 = normal, 2 = double speed
 
 function playSound(name) {
   if (soundEnabled && SOUNDS[name]) {
@@ -914,8 +915,8 @@ function renderSettingsScreen() {
         <div class="setting-item">
           <div class="volume-control">
             <span class="volume-label">Starfield Speed:</span>
-            <input type="range" id="starfield-speed" min="0" max="2" step="0.01" value="${starfieldSpeed}" />
-            <span class="volume-display" id="starfield-speed-display">${Math.round(starfieldSpeed * 100)}%</span>
+            <input type="range" id="starfield-speed" min="1" max="2" step="0.01" value="${starfieldSpeed}" />
+            <span class="volume-display" id="starfield-speed-display">${Math.round((starfieldSpeed - 1) * 100)}%</span>
           </div>
         </div>
       </div>
@@ -978,7 +979,7 @@ function renderSettingsScreen() {
   // Starfield speed slider event listener
   document.getElementById('starfield-speed').addEventListener('input', e => {
     starfieldSpeed = parseFloat(e.target.value);
-    document.getElementById('starfield-speed-display').textContent = Math.round(starfieldSpeed * 100) + '%';
+    document.getElementById('starfield-speed-display').textContent = Math.round((starfieldSpeed - 1) * 100) + '%';
     saveGame();
   });
   
