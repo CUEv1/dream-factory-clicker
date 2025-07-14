@@ -1281,6 +1281,8 @@ function addOrbAccessibility() {
 }
 
 // --- Add ARIA attributes to dynamic elements where relevant (e.g., floating numbers, buttons) ---
+const FLOATING_NUMBER_ANIMATION_DISTANCE = 40;
+const FLOATING_NUMBER_ANIMATION_DURATION = 900;
 function showFloatingNumber(e, value = 1) {
   const orb = document.getElementById('dream-orb');
   const num = document.createElement('div');
