@@ -114,6 +114,10 @@ function canPrestige() {
 function prestige() {
   if (!canPrestige()) return;
 
+  // Show warning confirmation
+  const confirmed = confirm('Are you sure? Prestiging will reset ALL Dream Energy, Generators, and Upgrades, but you\'ll gain Lucidity Points for permanent bonuses.');
+  if (!confirmed) return;
+
   const lucidityGain = calculateLucidityGain();
   lucidityPoints += lucidityGain;
   totalPrestiges++;
@@ -123,6 +127,7 @@ function prestige() {
   GENERATORS.forEach(gen => {
     generatorState[gen.id] = { count: 0, level: 1 };
   });
+  clickerUpgrades = { clickValue: 1, clickValueLevel: 0 };
 
   updateEnergyCounter();
   renderCurrentScreen();
