@@ -255,6 +255,9 @@ function renderNavigation() {
   app.insertAdjacentHTML('afterbegin', nav);
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', e => {
+      if (btn.dataset.tab !== currentScreen) {
+        playSound('menu'); // Play menu switch sound
+      }
       currentScreen = btn.dataset.tab;
       renderCurrentScreen();
     });
@@ -565,29 +568,61 @@ const SOUNDS = {
   purchase: new Audio('assets/sounds/purchase.mp3'),
   prestige: new Audio('assets/sounds/prestige.mp3'),
   ambient: new Audio('assets/sounds/ambient.mp3'),
+  menu: new Audio('assets/sounds/menu.mp3'), // New menu switch sound
 };
 SOUNDS.ambient.loop = true;
 SOUNDS.ambient.volume = 0.4;
 
 let soundEnabled = true;
 let musicEnabled = true;
+let soundVolume = 0.7;
+let musicVolume = 0.4;
+let menuVolume = 0.5;
 
 function playSound(name) {
   if (soundEnabled && SOUNDS[name]) {
     SOUNDS[name].currentTime = 0;
+    // Apply appropriate volume based on sound type
+    if (name === 'ambient') {
+      SOUNDS[name].volume = musicVolume;
+    } else if (name === 'menu') {
+      SOUNDS[name].volume = menuVolume;
+    } else {
+      SOUNDS[name].volume = soundVolume;
+    }
     SOUNDS[name].play();
   }
 }
 
 function playMusic() {
   if (musicEnabled) {
-    SOUNDS.ambient.volume = 0.4;
+    SOUNDS.ambient.volume = musicVolume;
     SOUNDS.ambient.play();
   }
 }
 function stopMusic() {
   SOUNDS.ambient.pause();
   SOUNDS.ambient.currentTime = 0;
+}
+
+function updateMusicVolume(volume) {
+  musicVolume = volume;
+  if (musicEnabled) {
+    SOUNDS.ambient.volume = musicVolume;
+  }
+}
+
+function updateSoundVolume(volume) {
+  soundVolume = volume;
+  // Update all sound effect volumes
+  SOUNDS.click.volume = soundVolume;
+  SOUNDS.purchase.volume = soundVolume;
+  SOUNDS.prestige.volume = soundVolume;
+}
+
+function updateMenuVolume(volume) {
+  menuVolume = volume;
+  SOUNDS.menu.volume = menuVolume;
 }
 
 // --- Integrate sounds into game actions ---
@@ -638,7 +673,7 @@ function prestige() {
   playSound('prestige');
 }
 
-// --- Settings Screen: Add sound/music toggles ---
+// --- Settings Screen: Add sound/music toggles and volume sliders ---
 function renderSettingsScreen() {
   const app = document.getElementById('app-root');
   app.innerHTML = `
@@ -651,8 +686,23 @@ function renderSettingsScreen() {
           <input type="checkbox" id="sound-toggle" ${soundEnabled ? 'checked' : ''} />
         </div>
         <div class="setting-item">
+          <label>Sound Effects Volume:</label>
+          <input type="range" id="sound-volume" min="0" max="1" step="0.1" value="${soundVolume}" />
+          <span class="volume-display">${Math.round(soundVolume * 100)}%</span>
+        </div>
+        <div class="setting-item">
           <label>Background Music:</label>
           <input type="checkbox" id="music-toggle" ${musicEnabled ? 'checked' : ''} />
+        </div>
+        <div class="setting-item">
+          <label>Music Volume:</label>
+          <input type="range" id="music-volume" min="0" max="1" step="0.1" value="${musicVolume}" />
+          <span class="volume-display">${Math.round(musicVolume * 100)}%</span>
+        </div>
+        <div class="setting-item">
+          <label>Menu Sounds Volume:</label>
+          <input type="range" id="menu-volume" min="0" max="1" step="0.1" value="${menuVolume}" />
+          <span class="volume-display">${Math.round(menuVolume * 100)}%</span>
         </div>
       </div>
       <div class="settings-section">
@@ -688,7 +738,7 @@ function renderSettingsScreen() {
       </div>
     </div>
   `;
-  // Add event listeners for toggles
+  // Add event listeners for toggles and volume sliders
   document.getElementById('sound-toggle').addEventListener('change', e => {
     soundEnabled = e.target.checked;
     if (soundEnabled) playSound('click');
@@ -697,6 +747,25 @@ function renderSettingsScreen() {
     musicEnabled = e.target.checked;
     if (musicEnabled) playMusic();
     else stopMusic();
+  });
+  
+  // Volume slider event listeners
+  document.getElementById('sound-volume').addEventListener('input', e => {
+    const volume = parseFloat(e.target.value);
+    updateSoundVolume(volume);
+    e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
+  });
+  
+  document.getElementById('music-volume').addEventListener('input', e => {
+    const volume = parseFloat(e.target.value);
+    updateMusicVolume(volume);
+    e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
+  });
+  
+  document.getElementById('menu-volume').addEventListener('input', e => {
+    const volume = parseFloat(e.target.value);
+    updateMenuVolume(volume);
+    e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
   });
 }
 

@@ -424,6 +424,9 @@ body {
 .setting-item label {
   font-weight: bold;
   color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .setting-desc {
@@ -504,6 +507,72 @@ body {
 
 #import-input::placeholder {
   color: #fff7;
+}
+
+.setting-item input[type="range"] {
+  background: rgba(40, 30, 60, 0.5);
+  border-radius: 0.5em;
+  height: 0.5em;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  margin: 0.5rem 0;
+  flex: 1;
+}
+
+.setting-item input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.2em;
+  height: 1.2em;
+  background: linear-gradient(45deg, #e0b3ff, #b3aaff);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #e0b3ff44;
+  transition: all 0.2s;
+}
+
+.setting-item input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px #e0b3ff88;
+}
+
+.setting-item input[type="range"]::-moz-range-thumb {
+  width: 1.2em;
+  height: 1.2em;
+  background: linear-gradient(45deg, #e0b3ff, #b3aaff);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px #e0b3ff44;
+  transition: all 0.2s;
+}
+
+.setting-item input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px #e0b3ff88;
+}
+
+.volume-display {
+  font-family: 'Orbitron', 'Comfortaa', Arial, sans-serif;
+  font-weight: bold;
+  color: #e0b3ff;
+  text-shadow: 0 0 8px #e0b3ff44;
+  margin-left: 0.5rem;
+  min-width: 3rem;
+  text-align: right;
+}
+
+.setting-item input[type="checkbox"] {
+  width: 1.2em;
+  height: 1.2em;
+  accent-color: #e0b3ff;
+  cursor: pointer;
+}
+
+.setting-item input[type="range"] {
+  margin: 0.3rem 0;
 }
 
 @media (max-width: 600px) {
