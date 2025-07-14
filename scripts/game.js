@@ -137,6 +137,8 @@ function prestige() {
     clickerUpgrades[upg.id + 'Level'] = 0;
   });
 
+  saveGame(); // Save the reset state immediately after prestige
+
   updateEnergyCounter();
   renderCurrentScreen();
 
