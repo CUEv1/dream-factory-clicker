@@ -19,6 +19,10 @@ body {
   background: #18182a;
   overflow-x: hidden;
   color: #f3eaff;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 #starfield {
@@ -55,6 +59,10 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 #dream-orb-container {
@@ -130,6 +138,10 @@ body {
   margin: 3rem auto;
   text-align: center;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.27);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 } 
 
 .nav-tabs {
@@ -170,6 +182,10 @@ body {
   margin: 3rem auto;
   text-align: center;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.27);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .generator-list {
   display: flex;
