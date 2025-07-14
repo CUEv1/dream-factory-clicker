@@ -69,6 +69,24 @@ window.addEventListener('resize', initStarfield);
 // --- Dream Orb Clicker Implementation ---
 let dreamEnergy = 0;
 
+// --- Clicker Upgrade System ---
+let clickerUpgrades = {
+  clickValue: 1, // Base click value
+  clickValueLevel: 0 // Current upgrade level
+};
+
+const CLICKER_UPGRADES = [
+  {
+    id: 'click-value',
+    name: 'Dream Touch',
+    description: 'Increase energy gained per click',
+    baseCost: 50,
+    costMultiplier: 1.5,
+    effect: (level) => level + 1, // Each level adds 1 to click value
+    maxLevel: 20
+  }
+];
+
 
 
 // --- Prestige (Lucidity) System ---
@@ -115,9 +133,10 @@ function getLucidityMultiplier() {
   return 1 + (lucidityPoints * 0.1); // 10% per Lucidity Point
 }
 
-// Update click value with Lucidity multiplier
+// Update click value with Lucidity multiplier and clicker upgrades
 function onOrbClick(e) {
-  const clickValue = Math.floor(1 * getLucidityMultiplier());
+  const baseClickValue = clickerUpgrades.clickValue;
+  const clickValue = Math.floor(baseClickValue * getLucidityMultiplier());
   dreamEnergy += clickValue;
   gameStats.totalClicks++;
   gameStats.totalEnergyEarned += clickValue;
@@ -253,6 +272,7 @@ function renderNavigation() {
   let nav = `<div class="nav-tabs">
     <button class="nav-btn" data-tab="main" ${currentScreen==='main'?'disabled':''}>Main Orb</button>
     <button class="nav-btn" data-tab="generators" ${currentScreen==='generators'?'disabled':''}>Generators</button>
+    <button class="nav-btn" data-tab="upgrades" ${currentScreen==='upgrades'?'disabled':''}>Upgrades</button>
     <button class="nav-btn" data-tab="lucidity" ${currentScreen==='lucidity'?'disabled':''}>Lucidity</button>
     <button class="nav-btn" data-tab="stats" ${currentScreen==='stats'?'disabled':''}>Stats</button>
     <button class="nav-btn" data-tab="settings" ${currentScreen==='settings'?'disabled':''}>Settings</button>
@@ -274,6 +294,8 @@ function renderCurrentScreen() {
     renderMainScreen();
   } else if (currentScreen === 'generators') {
     renderGeneratorsScreen();
+  } else if (currentScreen === 'upgrades') {
+    renderUpgradesScreen();
   } else if (currentScreen === 'lucidity') {
     renderLucidityScreen();
   } else if (currentScreen === 'stats') {
@@ -438,6 +460,94 @@ function getGeneratorUpgradeCost(id) {
   return Math.floor(gen.baseCost * 5 * Math.pow(2, state.level));
 }
 
+// --- Clicker Upgrade Functions ---
+function getUpgradeCost(upgradeId) {
+  const upgrade = CLICKER_UPGRADES.find(u => u.id === upgradeId);
+  const currentLevel = clickerUpgrades[upgradeId + 'Level'] || 0;
+  return Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, currentLevel));
+}
+
+function canAffordUpgrade(upgradeId) {
+  return dreamEnergy >= getUpgradeCost(upgradeId);
+}
+
+function purchaseUpgrade(upgradeId) {
+  const upgrade = CLICKER_UPGRADES.find(u => u.id === upgradeId);
+  const currentLevel = clickerUpgrades[upgradeId + 'Level'] || 0;
+  
+  if (currentLevel >= upgrade.maxLevel) return;
+  if (!canAffordUpgrade(upgradeId)) return;
+  
+  const cost = getUpgradeCost(upgradeId);
+  dreamEnergy -= cost;
+  
+  // Update upgrade level
+  clickerUpgrades[upgradeId + 'Level'] = currentLevel + 1;
+  
+  // Update the actual effect
+  if (upgradeId === 'click-value') {
+    clickerUpgrades.clickValue = upgrade.effect(clickerUpgrades[upgradeId + 'Level']);
+  }
+  
+  // Track upgrade purchase in stats
+  gameStats.upgradesPurchased++;
+  
+  updateEnergyCounter();
+  renderCurrentScreen();
+  playSound('upgrade');
+}
+
+// --- Upgrades Screen ---
+function renderUpgradesScreen() {
+  const app = document.getElementById('app-root');
+  app.innerHTML = `
+    <div class="upgrades-screen glass">
+      <h2>Dream Upgrades</h2>
+      <div class="upgrade-list">
+        ${CLICKER_UPGRADES.map(upgrade => {
+          const currentLevel = clickerUpgrades[upgrade.id + 'Level'] || 0;
+          const cost = getUpgradeCost(upgrade.id);
+          const canAfford = canAffordUpgrade(upgrade.id);
+          const isMaxed = currentLevel >= upgrade.maxLevel;
+          
+          let currentEffect = 0;
+          if (upgrade.id === 'click-value') {
+            currentEffect = clickerUpgrades.clickValue;
+          }
+          
+          let nextEffect = 0;
+          if (!isMaxed) {
+            nextEffect = upgrade.effect(currentLevel + 1);
+          }
+          
+          return `<div class="upgrade-card" style="--upgrade-color: #b3aaff">
+            <div class="upgrade-icon">✨</div>
+            <div class="upgrade-info">
+              <div class="upgrade-name">${upgrade.name}</div>
+              <div class="upgrade-desc">${upgrade.description}</div>
+              <div class="upgrade-level">Level: <b>${currentLevel}</b>/${upgrade.maxLevel}</div>
+              <div class="upgrade-effect">Current: <b>+${currentEffect}</b> per click</div>
+              ${!isMaxed ? `<div class="upgrade-next">Next: <b>+${nextEffect}</b> per click</div>` : ''}
+              <button class="upgrade-btn ${canAfford && !isMaxed ? '' : 'disabled'}" data-id="${upgrade.id}" ${isMaxed ? 'disabled' : ''}>
+                ${isMaxed ? 'Maxed' : `Upgrade<br><span>${cost}</span>`}
+              </button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+  
+  // Add event listeners
+  document.querySelectorAll('.upgrade-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!btn.disabled) {
+        purchaseUpgrade(btn.dataset.id);
+      }
+    });
+  });
+}
+
 // --- Lucidity Screen ---
 function renderLucidityScreen() {
   const progress = calculatePrestigeProgress();
@@ -591,6 +701,7 @@ function saveGame() {
     lucidityPoints,
     totalPrestiges,
     generatorState,
+    clickerUpgrades,
     gameStats,
     soundEnabled,
     musicEnabled,
@@ -619,6 +730,7 @@ function loadGame() {
       lucidityPoints = saveData.lucidityPoints || 0;
       totalPrestiges = saveData.totalPrestiges || 0;
       generatorState = saveData.generatorState || {};
+      clickerUpgrades = saveData.clickerUpgrades || { clickValue: 1, clickValueLevel: 0 };
       gameStats = saveData.gameStats || gameStats;
       
       // Load audio settings
@@ -651,6 +763,7 @@ function exportSaveData() {
     lucidityPoints,
     totalPrestiges,
     generatorState,
+    clickerUpgrades,
     gameStats,
     soundEnabled,
     musicEnabled,
@@ -671,6 +784,7 @@ function importSaveData(importString) {
     lucidityPoints = saveData.lucidityPoints || 0;
     totalPrestiges = saveData.totalPrestiges || 0;
     generatorState = saveData.generatorState || {};
+    clickerUpgrades = saveData.clickerUpgrades || { clickValue: 1, clickValueLevel: 0 };
     gameStats = saveData.gameStats || gameStats;
     
     // Load audio settings
@@ -703,6 +817,7 @@ function resetGame() {
     dreamEnergy = 0;
     lucidityPoints = 0;
     totalPrestiges = 0;
+    clickerUpgrades = { clickValue: 1, clickValueLevel: 0 };
     gameStats = {
       totalClicks: 0,
       totalEnergyEarned: 0,
@@ -929,6 +1044,10 @@ function renderStatisticsScreen() {
           <div class="stat-item">
             <span class="stat-label">Click Multiplier:</span>
             <span class="stat-value">${getLucidityMultiplier().toFixed(1)}x</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Click Value:</span>
+            <span class="stat-value">+${clickerUpgrades.clickValue}</span>
           </div>
           <div class="stat-item">
             <span class="stat-label">Total Production:</span>

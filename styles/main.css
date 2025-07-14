@@ -410,6 +410,143 @@ body {
   }
 } 
 
+/* --- Upgrades Screen --- */
+.upgrades-screen {
+  padding: 2.5rem 2rem 2rem 2rem;
+  max-width: 600px;
+  margin: 3rem auto;
+  text-align: center;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.27);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.upgrade-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.upgrade-card {
+  display: flex;
+  align-items: center;
+  background: rgba(40, 30, 60, 0.45);
+  border-radius: 1.5em;
+  padding: 1.5rem;
+  border: 2px solid var(--upgrade-color, #b3aaff);
+  box-shadow: 0 4px 16px var(--upgrade-color, #b3aaff)33;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.upgrade-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--upgrade-color, #b3aaff)22, transparent);
+  transition: left 0.5s;
+}
+
+.upgrade-card:hover::before {
+  left: 100%;
+}
+
+.upgrade-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px var(--upgrade-color, #b3aaff)55;
+}
+
+.upgrade-icon {
+  font-size: 2.5em;
+  margin-right: 1.5rem;
+  color: var(--upgrade-color, #b3aaff);
+  text-shadow: 0 0 12px var(--upgrade-color, #b3aaff);
+  animation: pulse 2s infinite ease-in-out;
+}
+
+.upgrade-info {
+  flex: 1;
+  text-align: left;
+}
+
+.upgrade-name {
+  font-family: 'Orbitron', 'Comfortaa', Arial, sans-serif;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 8px var(--upgrade-color, #b3aaff);
+}
+
+.upgrade-desc {
+  color: #ccc;
+  font-size: 0.95rem;
+  margin-bottom: 0.8rem;
+  line-height: 1.4;
+}
+
+.upgrade-level, .upgrade-effect, .upgrade-next {
+  font-size: 0.9rem;
+  color: #ddd;
+  margin-bottom: 0.3rem;
+}
+
+.upgrade-next {
+  color: #b3aaff;
+  font-weight: bold;
+}
+
+.upgrade-btn {
+  background: linear-gradient(135deg, var(--upgrade-color, #b3aaff), #7f7fff);
+  border: none;
+  border-radius: 1em;
+  color: #fff;
+  font-family: 'Orbitron', 'Comfortaa', Arial, sans-serif;
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 0.8em 1.5em;
+  margin-left: 1rem;
+  box-shadow: 0 4px 16px var(--upgrade-color, #b3aaff)44;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  min-width: 100px;
+}
+
+.upgrade-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 24px var(--upgrade-color, #b3aaff)66;
+}
+
+.upgrade-btn:disabled {
+  background: rgba(100, 100, 100, 0.3);
+  color: #888;
+  cursor: default;
+  box-shadow: none;
+}
+
+.upgrade-btn span {
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+  opacity: 0.9;
+}
+
+@media (max-width: 700px) {
+  .upgrades-screen { max-width: 98vw; }
+  .upgrade-card { flex-direction: column; align-items: flex-start; gap: 0.7em; }
+  .upgrade-icon { margin-right: 0; }
+  .upgrade-info { text-align: left; width: 100%; }
+  .upgrade-btn { margin-left: 0; margin-top: 0.5rem; }
+}
+
 .lucidity-screen {
   padding: 2.5rem 2rem 2rem 2rem;
   max-width: 500px;
