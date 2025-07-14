@@ -177,6 +177,37 @@ const GENERATORS = [
     color: '#7fffd4',
     icon: '✨',
   },
+  // New generators (locked until prestige)
+  {
+    id: 'dream-reactor',
+    name: 'Dream Reactor',
+    baseCost: 3500,
+    baseProduction: 22,
+    description: 'Converts lucid dreams into raw energy.',
+    color: '#ffd700',
+    icon: '⚛️',
+    requiresPrestige: true,
+  },
+  {
+    id: 'astral-engine',
+    name: 'Astral Engine',
+    baseCost: 18000,
+    baseProduction: 110,
+    description: 'Taps into astral currents for immense power.',
+    color: '#00e5ff',
+    icon: '🚀',
+    requiresPrestige: true,
+  },
+  {
+    id: 'cosmic-loom',
+    name: 'Cosmic Loom',
+    baseCost: 95000,
+    baseProduction: 600,
+    description: 'Weaves the fabric of the cosmos into energy.',
+    color: '#ff69b4',
+    icon: '🪐',
+    requiresPrestige: true,
+  },
 ];
 
 let generatorState = {};
@@ -310,9 +341,22 @@ function renderGeneratorsScreen() {
           const currentProduction = getGeneratorProduction(gen.id);
           const nextProduction = gen.baseProduction * (state.count + 1) * Math.pow(1.15, state.level - 1);
           const productionIncrease = nextProduction - currentProduction;
-          return `<div class="generator-card ${animation.class}" style="--gen-color:${gen.color}">
+          const locked = gen.requiresPrestige && totalPrestiges === 0;
+          if (locked) {
+            return `<div class="generator-card locked" style="--gen-color:${gen.color}">
+              <div class="gen-animation-container">
+                <span style="font-size:2.5em;">🔒</span>
+              </div>
+              <div class="gen-info">
+                <div class="gen-name">${gen.name}</div>
+                <div class="gen-desc">${gen.description}</div>
+                <div class="gen-locked-msg">Unlocks after your first Prestige!</div>
+              </div>
+            </div>`;
+          }
+          return `<div class="generator-card ${animation ? animation.class : ''}" style="--gen-color:${gen.color}">
             <div class="gen-animation-container">
-              ${animation.svg}
+              ${animation ? animation.svg : gen.icon}
             </div>
             <div class="gen-info">
               <div class="gen-name">${gen.name}</div>
@@ -348,9 +392,22 @@ function updateGeneratorsDisplay() {
       const currentProduction = getGeneratorProduction(gen.id);
       const nextProduction = gen.baseProduction * (state.count + 1) * Math.pow(1.15, state.level - 1);
       const productionIncrease = nextProduction - currentProduction;
-      return `<div class="generator-card ${animation.class}" style="--gen-color:${gen.color}">
+      const locked = gen.requiresPrestige && totalPrestiges === 0;
+      if (locked) {
+        return `<div class="generator-card locked" style="--gen-color:${gen.color}">
+          <div class="gen-animation-container">
+            <span style="font-size:2.5em;">🔒</span>
+          </div>
+          <div class="gen-info">
+            <div class="gen-name">${gen.name}</div>
+            <div class="gen-desc">${gen.description}</div>
+            <div class="gen-locked-msg">Unlocks after your first Prestige!</div>
+          </div>
+        </div>`;
+      }
+      return `<div class="generator-card ${animation ? animation.class : ''}" style="--gen-color:${gen.color}">
         <div class="gen-animation-container">
-          ${animation.svg}
+          ${animation ? animation.svg : gen.icon}
         </div>
         <div class="gen-info">
           <div class="gen-name">${gen.name}</div>
@@ -745,6 +802,8 @@ function updateMenuVolume(volume) {
 // --- Integrate sounds into game actions ---
 // Play purchase/upgrade sound
 function purchaseGenerator(id) {
+  const gen = GENERATORS.find(g => g.id === id);
+  if (gen.requiresPrestige && totalPrestiges === 0) return;
   const cost = getGeneratorCost(id);
   if (dreamEnergy >= cost) {
     dreamEnergy -= cost;
@@ -757,6 +816,7 @@ function purchaseGenerator(id) {
 }
 function upgradeGenerator(id) {
   const gen = GENERATORS.find(g => g.id === id);
+  if (gen.requiresPrestige && totalPrestiges === 0) return;
   const state = generatorState[id];
   const upgradeCost = Math.floor(gen.baseCost * 5 * Math.pow(2, state.level));
   if (dreamEnergy >= upgradeCost && state.level < 10) {
