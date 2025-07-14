@@ -124,9 +124,52 @@ function prestige() {
     generatorState[gen.id] = { count: 0, level: 1 };
   });
   
+  // Create prestige particles
+  createPrestigeParticles();
+  
   updateEnergyCounter();
   renderCurrentScreen();
-  // TODO: Play prestige sound and show celebration animation
+  
+  // Play prestige sound with reduced volume
+  if (soundEnabled) {
+    SOUNDS.prestige.volume = soundVolume * 0.5; // 50% of normal volume
+    SOUNDS.prestige.play();
+  }
+  
+  // Remove particles after animation
+  setTimeout(() => {
+    const particles = document.querySelector('.prestige-particles');
+    if (particles) {
+      particles.remove();
+    }
+  }, 3000);
+}
+
+function createPrestigeParticles() {
+  const particles = document.createElement('div');
+  particles.className = 'prestige-particles';
+  
+  // Create 20 particles
+  for (let i = 0; i < 20; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'prestige-particle';
+    
+    // Random starting position around the orb
+    const angle = (Math.PI * 2 * i) / 20;
+    const distance = 100 + Math.random() * 50;
+    const startX = window.innerWidth / 2 + Math.cos(angle) * distance;
+    const startY = window.innerHeight / 2 + Math.sin(angle) * distance;
+    
+    particle.style.left = startX + 'px';
+    particle.style.top = startY + 'px';
+    
+    // Random animation delay
+    particle.style.animationDelay = Math.random() * 0.5 + 's';
+    
+    particles.appendChild(particle);
+  }
+  
+  document.body.appendChild(particles);
 }
 
 function getLucidityMultiplier() {
@@ -736,9 +779,9 @@ function loadGame() {
       // Load audio settings
       soundEnabled = saveData.soundEnabled !== undefined ? saveData.soundEnabled : true;
       musicEnabled = saveData.musicEnabled !== undefined ? saveData.musicEnabled : true;
-      soundVolume = saveData.soundVolume !== undefined ? saveData.soundVolume : 0.7;
-      musicVolume = saveData.musicVolume !== undefined ? saveData.musicVolume : 0.4;
-      menuVolume = saveData.menuVolume !== undefined ? saveData.menuVolume : 0.5;
+      soundVolume = saveData.soundVolume !== undefined ? saveData.soundVolume : 1.0;
+      musicVolume = saveData.musicVolume !== undefined ? saveData.musicVolume : 1.0;
+      menuVolume = saveData.menuVolume !== undefined ? saveData.menuVolume : 1.0;
       starfieldSpeed = saveData.starfieldSpeed !== undefined ? saveData.starfieldSpeed : 1;
       
       // Ensure all generators exist in state
@@ -790,9 +833,9 @@ function importSaveData(importString) {
     // Load audio settings
     soundEnabled = saveData.soundEnabled !== undefined ? saveData.soundEnabled : true;
     musicEnabled = saveData.musicEnabled !== undefined ? saveData.musicEnabled : true;
-    soundVolume = saveData.soundVolume !== undefined ? saveData.soundVolume : 0.7;
-    musicVolume = saveData.musicVolume !== undefined ? saveData.musicVolume : 0.4;
-    menuVolume = saveData.menuVolume !== undefined ? saveData.menuVolume : 0.5;
+    soundVolume = saveData.soundVolume !== undefined ? saveData.soundVolume : 1.0;
+    musicVolume = saveData.musicVolume !== undefined ? saveData.musicVolume : 1.0;
+    menuVolume = saveData.menuVolume !== undefined ? saveData.menuVolume : 1.0;
     starfieldSpeed = saveData.starfieldSpeed !== undefined ? saveData.starfieldSpeed : 1;
     
     // Ensure all generators exist in state
@@ -830,9 +873,9 @@ function resetGame() {
     // Reset audio settings to defaults
     soundEnabled = true;
     musicEnabled = true;
-    soundVolume = 0.7;
-    musicVolume = 0.4;
-    menuVolume = 0.5;
+    soundVolume = 1.0;
+    musicVolume = 1.0;
+    menuVolume = 1.0;
     starfieldSpeed = 1; // Reset starfield speed to default
     GENERATORS.forEach(gen => {
       generatorState[gen.id] = { count: 0, level: 1 };
@@ -863,9 +906,9 @@ SOUNDS.ambient.volume = 0.4;
 
 let soundEnabled = true;
 let musicEnabled = true;
-let soundVolume = 0.7;
-let musicVolume = 0.4;
-let menuVolume = 0.5;
+let soundVolume = 1.0; // 100% default
+let musicVolume = 1.0; // 100% default
+let menuVolume = 1.0; // 100% default
 let starfieldSpeed = 1; // 1 = normal, 2 = double speed
 
 function playSound(name) {
