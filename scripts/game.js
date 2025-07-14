@@ -113,62 +113,69 @@ function canPrestige() {
 
 function prestige() {
   if (!canPrestige()) return;
-  
+
   const lucidityGain = calculateLucidityGain();
   lucidityPoints += lucidityGain;
   totalPrestiges++;
-  
+
   // Reset current progress
   dreamEnergy = 0;
   GENERATORS.forEach(gen => {
     generatorState[gen.id] = { count: 0, level: 1 };
   });
-  
-  // Create prestige particles
-  createPrestigeParticles();
-  
+
   updateEnergyCounter();
   renderCurrentScreen();
-  
-  // Play prestige sound with reduced volume
-  if (soundEnabled) {
-    SOUNDS.prestige.volume = soundVolume * 0.25; // 25% of SFX volume
-    SOUNDS.prestige.play();
-  }
-  
-  // Remove particles after animation
+
+  // Now create the particles, anchored to the orb
+  createPrestigeParticles();
+
+  playSound('prestige');
+
   setTimeout(() => {
     const particles = document.querySelector('.prestige-particles');
-    if (particles) {
-      particles.remove();
-    }
+    if (particles) particles.remove();
   }, 3000);
 }
 
 function createPrestigeParticles() {
+  const orb = document.getElementById('dream-orb');
+  if (!orb) return;
+  const orbRect = orb.getBoundingClientRect();
+
   const particles = document.createElement('div');
   particles.className = 'prestige-particles';
-  
-  // Create 20 particles
+
   for (let i = 0; i < 20; i++) {
     const particle = document.createElement('div');
     particle.className = 'prestige-particle';
-    
-    // Random starting position around the orb
+
+    // Center of the orb
+    const centerX = orbRect.left + orbRect.width / 2;
+    const centerY = orbRect.top + orbRect.height / 2;
+
+    // Random angle and distance
     const angle = (Math.PI * 2 * i) / 20;
     const distance = 100 + Math.random() * 50;
-    const startX = window.innerWidth / 2 + Math.cos(angle) * distance;
-    const startY = window.innerHeight / 2 + Math.sin(angle) * distance;
-    
-    particle.style.left = startX + 'px';
-    particle.style.top = startY + 'px';
-    
-    // Random animation delay
-    particle.style.animationDelay = Math.random() * 0.5 + 's';
-    
+    const endX = centerX + Math.cos(angle) * distance;
+    const endY = centerY + Math.sin(angle) * distance - 100;
+
+    particle.style.left = `${centerX}px`;
+    particle.style.top = `${centerY}px`;
+
+    // Animate to (endX, endY) using transform
+    particle.animate([
+      { transform: 'translate(0,0) scale(1)', opacity: 1 },
+      { transform: `translate(${endX - centerX}px,${endY - centerY}px) scale(1.5)`, opacity: 0 }
+    ], {
+      duration: 3000,
+      delay: Math.random() * 500,
+      fill: 'forwards'
+    });
+
     particles.appendChild(particle);
   }
-  
+
   document.body.appendChild(particles);
 }
 
