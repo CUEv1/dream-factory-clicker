@@ -682,27 +682,28 @@ function renderSettingsScreen() {
       <div class="settings-section">
         <h3>Audio</h3>
         <div class="setting-item">
-          <label>Sound Effects:</label>
-          <input type="checkbox" id="sound-toggle" ${soundEnabled ? 'checked' : ''} />
+          <div class="volume-control">
+            <span class="volume-label">Sound Effects:</span>
+            <input type="range" id="sound-volume" min="0" max="1" step="0.1" value="${soundVolume}" />
+            <span class="volume-display">${Math.round(soundVolume * 100)}%</span>
+            <button class="mute-btn ${soundEnabled ? '' : 'muted'}" id="sound-mute">${soundEnabled ? 'Mute' : 'Unmute'}</button>
+          </div>
         </div>
         <div class="setting-item">
-          <label>Sound Effects Volume:</label>
-          <input type="range" id="sound-volume" min="0" max="1" step="0.1" value="${soundVolume}" />
-          <span class="volume-display">${Math.round(soundVolume * 100)}%</span>
+          <div class="volume-control">
+            <span class="volume-label">Background Music:</span>
+            <input type="range" id="music-volume" min="0" max="1" step="0.1" value="${musicVolume}" />
+            <span class="volume-display">${Math.round(musicVolume * 100)}%</span>
+            <button class="mute-btn ${musicEnabled ? '' : 'muted'}" id="music-mute">${musicEnabled ? 'Mute' : 'Unmute'}</button>
+          </div>
         </div>
         <div class="setting-item">
-          <label>Background Music:</label>
-          <input type="checkbox" id="music-toggle" ${musicEnabled ? 'checked' : ''} />
-        </div>
-        <div class="setting-item">
-          <label>Music Volume:</label>
-          <input type="range" id="music-volume" min="0" max="1" step="0.1" value="${musicVolume}" />
-          <span class="volume-display">${Math.round(musicVolume * 100)}%</span>
-        </div>
-        <div class="setting-item">
-          <label>Menu Sounds Volume:</label>
-          <input type="range" id="menu-volume" min="0" max="1" step="0.1" value="${menuVolume}" />
-          <span class="volume-display">${Math.round(menuVolume * 100)}%</span>
+          <div class="volume-control">
+            <span class="volume-label">Menu Sounds:</span>
+            <input type="range" id="menu-volume" min="0" max="1" step="0.1" value="${menuVolume}" />
+            <span class="volume-display">${Math.round(menuVolume * 100)}%</span>
+            <button class="mute-btn" id="menu-mute">Mute</button>
+          </div>
         </div>
       </div>
       <div class="settings-section">
@@ -738,16 +739,6 @@ function renderSettingsScreen() {
       </div>
     </div>
   `;
-  // Add event listeners for toggles and volume sliders
-  document.getElementById('sound-toggle').addEventListener('change', e => {
-    soundEnabled = e.target.checked;
-    if (soundEnabled) playSound('click');
-  });
-  document.getElementById('music-toggle').addEventListener('change', e => {
-    musicEnabled = e.target.checked;
-    if (musicEnabled) playMusic();
-    else stopMusic();
-  });
   
   // Volume slider event listeners
   document.getElementById('sound-volume').addEventListener('input', e => {
@@ -766,6 +757,34 @@ function renderSettingsScreen() {
     const volume = parseFloat(e.target.value);
     updateMenuVolume(volume);
     e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
+  });
+  
+  // Mute button event listeners
+  document.getElementById('sound-mute').addEventListener('click', e => {
+    soundEnabled = !soundEnabled;
+    e.target.textContent = soundEnabled ? 'Mute' : 'Unmute';
+    e.target.classList.toggle('muted', !soundEnabled);
+    if (soundEnabled) playSound('click');
+  });
+  
+  document.getElementById('music-mute').addEventListener('click', e => {
+    musicEnabled = !musicEnabled;
+    e.target.textContent = musicEnabled ? 'Mute' : 'Unmute';
+    e.target.classList.toggle('muted', !musicEnabled);
+    if (musicEnabled) playMusic();
+    else stopMusic();
+  });
+  
+  document.getElementById('menu-mute').addEventListener('click', e => {
+    const menuMuted = e.target.classList.contains('muted');
+    e.target.textContent = menuMuted ? 'Mute' : 'Unmute';
+    e.target.classList.toggle('muted', !menuMuted);
+    // Toggle menu sound by setting volume to 0 when muted
+    if (menuMuted) {
+      updateMenuVolume(menuVolume);
+    } else {
+      updateMenuVolume(0);
+    }
   });
 }
 
