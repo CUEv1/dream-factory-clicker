@@ -1184,3 +1184,61 @@ button:focus-visible, .nav-btn:focus-visible, .gen-buy-btn:focus-visible, .gen-u
     scroll-behavior: auto !important;
   }
 } 
+
+/* --- Prestige Generator Animations --- */
+.reactor-animation .reactor-outer {
+  animation: rotate 7s linear infinite;
+  transform-origin: 50% 50%;
+}
+.reactor-animation .reactor-inner {
+  animation: rotate 5s linear infinite reverse;
+  transform-origin: 50% 50%;
+}
+.reactor-animation .reactor-core {
+  animation: pulse 2.2s ease-in-out infinite;
+}
+.reactor-animation .beam {
+  animation: beamGlow 1.2s ease-in-out infinite alternate;
+}
+@keyframes beamGlow {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; filter: drop-shadow(0 0 8px #ffd700); }
+}
+
+.engine-animation .engine-outer {
+  animation: rotate 8s linear infinite;
+  transform-origin: 50% 50%;
+}
+.engine-animation .engine-inner {
+  animation: rotate 4s linear infinite reverse;
+  transform-origin: 50% 50%;
+}
+.engine-animation .engine-core {
+  animation: pulse 1.8s ease-in-out infinite;
+}
+.engine-animation .fin {
+  animation: engineFinMove 2.5s ease-in-out infinite alternate;
+}
+@keyframes engineFinMove {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; filter: drop-shadow(0 0 8px #00e5ff); }
+}
+
+.cosmic-animation .cosmic-outer {
+  animation: rotate 10s linear infinite;
+  transform-origin: 50% 50%;
+}
+.cosmic-animation .cosmic-inner {
+  animation: rotate 7s linear infinite reverse;
+  transform-origin: 50% 50%;
+}
+.cosmic-animation .cosmic-core {
+  animation: pulse 2.5s ease-in-out infinite;
+}
+.cosmic-animation .star {
+  animation: cosmicStarTwinkle 2.2s ease-in-out infinite alternate;
+}
+@keyframes cosmicStarTwinkle {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; filter: drop-shadow(0 0 8px #ff69b4); }
+} 

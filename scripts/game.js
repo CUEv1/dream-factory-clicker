@@ -426,6 +426,49 @@ const GENERATOR_ANIMATIONS = {
       </g>
     </svg>`,
     class: 'starlight-animation'
+  },
+  // --- Prestige Generators ---
+  'dream-reactor': {
+    svg: `<svg class="gen-animation" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="3" class="reactor-outer"/>
+      <circle cx="50" cy="50" r="22" fill="none" stroke="#fff3" stroke-width="2" class="reactor-inner"/>
+      <ellipse cx="50" cy="50" rx="10" ry="18" fill="#ffd70055" class="reactor-core"/>
+      <g class="reactor-beams">
+        <rect x="48" y="10" width="4" height="18" fill="#ffd700" class="beam"/>
+        <rect x="48" y="72" width="4" height="18" fill="#ffd700" class="beam"/>
+        <rect x="10" y="48" width="18" height="4" fill="#ffd700" class="beam"/>
+        <rect x="72" y="48" width="18" height="4" fill="#ffd700" class="beam"/>
+      </g>
+    </svg>`,
+    class: 'reactor-animation'
+  },
+  'astral-engine': {
+    svg: `<svg class="gen-animation" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="36" fill="none" stroke="#00e5ff" stroke-width="3" class="engine-outer"/>
+      <circle cx="50" cy="50" r="18" fill="none" stroke="#00e5ff" stroke-width="2" class="engine-inner"/>
+      <polygon points="50,20 60,50 50,80 40,50" fill="#00e5ff88" class="engine-core"/>
+      <g class="engine-fins">
+        <rect x="47" y="5" width="6" height="18" fill="#00e5ff" class="fin"/>
+        <rect x="47" y="77" width="6" height="18" fill="#00e5ff" class="fin"/>
+        <rect x="5" y="47" width="18" height="6" fill="#00e5ff" class="fin"/>
+        <rect x="77" y="47" width="18" height="6" fill="#00e5ff" class="fin"/>
+      </g>
+    </svg>`,
+    class: 'engine-animation'
+  },
+  'cosmic-loom': {
+    svg: `<svg class="gen-animation" viewBox="0 0 100 100">
+      <ellipse cx="50" cy="50" rx="40" ry="28" fill="none" stroke="#ff69b4" stroke-width="3" class="cosmic-outer"/>
+      <ellipse cx="50" cy="50" rx="24" ry="12" fill="none" stroke="#fff3" stroke-width="2" class="cosmic-inner"/>
+      <circle cx="50" cy="50" r="8" fill="#ff69b4" class="cosmic-core"/>
+      <g class="cosmic-stars">
+        <circle cx="20" cy="40" r="2" fill="#ff69b4" class="star"/>
+        <circle cx="80" cy="60" r="2" fill="#ff69b4" class="star"/>
+        <circle cx="30" cy="80" r="2" fill="#ff69b4" class="star"/>
+        <circle cx="70" cy="20" r="2" fill="#ff69b4" class="star"/>
+      </g>
+    </svg>`,
+    class: 'cosmic-animation'
   }
 };
 
