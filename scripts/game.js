@@ -533,6 +533,11 @@ function saveGame() {
     totalPrestiges,
     generatorState,
     gameStats,
+    soundEnabled,
+    musicEnabled,
+    soundVolume,
+    musicVolume,
+    menuVolume,
     lastSaveTime: Date.now()
   };
   
@@ -555,6 +560,13 @@ function loadGame() {
       totalPrestiges = saveData.totalPrestiges || 0;
       generatorState = saveData.generatorState || {};
       gameStats = saveData.gameStats || gameStats;
+      
+      // Load audio settings
+      soundEnabled = saveData.soundEnabled !== undefined ? saveData.soundEnabled : true;
+      musicEnabled = saveData.musicEnabled !== undefined ? saveData.musicEnabled : true;
+      soundVolume = saveData.soundVolume !== undefined ? saveData.soundVolume : 0.7;
+      musicVolume = saveData.musicVolume !== undefined ? saveData.musicVolume : 0.4;
+      menuVolume = saveData.menuVolume !== undefined ? saveData.menuVolume : 0.5;
       
       // Ensure all generators exist in state
       GENERATORS.forEach(gen => {
@@ -579,6 +591,11 @@ function exportSaveData() {
     totalPrestiges,
     generatorState,
     gameStats,
+    soundEnabled,
+    musicEnabled,
+    soundVolume,
+    musicVolume,
+    menuVolume,
     exportTime: Date.now()
   };
   return btoa(JSON.stringify(saveData)); // Base64 encode
@@ -593,6 +610,13 @@ function importSaveData(importString) {
     totalPrestiges = saveData.totalPrestiges || 0;
     generatorState = saveData.generatorState || {};
     gameStats = saveData.gameStats || gameStats;
+    
+    // Load audio settings
+    soundEnabled = saveData.soundEnabled !== undefined ? saveData.soundEnabled : true;
+    musicEnabled = saveData.musicEnabled !== undefined ? saveData.musicEnabled : true;
+    soundVolume = saveData.soundVolume !== undefined ? saveData.soundVolume : 0.7;
+    musicVolume = saveData.musicVolume !== undefined ? saveData.musicVolume : 0.4;
+    menuVolume = saveData.menuVolume !== undefined ? saveData.menuVolume : 0.5;
     
     // Ensure all generators exist in state
     GENERATORS.forEach(gen => {
@@ -625,6 +649,12 @@ function resetGame() {
       upgradesPurchased: 0,
       startTime: Date.now()
     };
+    // Reset audio settings to defaults
+    soundEnabled = true;
+    musicEnabled = true;
+    soundVolume = 0.7;
+    musicVolume = 0.4;
+    menuVolume = 0.5;
     GENERATORS.forEach(gen => {
       generatorState[gen.id] = { count: 0, level: 1 };
     });
@@ -914,18 +944,21 @@ function renderSettingsScreen() {
     const volume = parseFloat(e.target.value);
     updateSoundVolume(volume);
     e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
+    saveGame(); // Save immediately when volume changes
   });
   
   document.getElementById('music-volume').addEventListener('input', e => {
     const volume = parseFloat(e.target.value);
     updateMusicVolume(volume);
     e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
+    saveGame(); // Save immediately when volume changes
   });
   
   document.getElementById('menu-volume').addEventListener('input', e => {
     const volume = parseFloat(e.target.value);
     updateMenuVolume(volume);
     e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
+    saveGame(); // Save immediately when volume changes
   });
   
   // Mute button event listeners
@@ -934,6 +967,7 @@ function renderSettingsScreen() {
     e.target.textContent = soundEnabled ? 'Mute' : 'Unmute';
     e.target.classList.toggle('muted', !soundEnabled);
     if (soundEnabled) playSound('click');
+    saveGame(); // Save immediately when mute state changes
   });
   
   document.getElementById('music-mute').addEventListener('click', e => {
@@ -942,6 +976,7 @@ function renderSettingsScreen() {
     e.target.classList.toggle('muted', !musicEnabled);
     if (musicEnabled) playMusic();
     else stopMusic();
+    saveGame(); // Save immediately when mute state changes
   });
   
   document.getElementById('menu-mute').addEventListener('click', e => {
@@ -954,6 +989,26 @@ function renderSettingsScreen() {
     } else {
       updateMenuVolume(0);
     }
+    saveGame(); // Save immediately when mute state changes
+  });
+}
+
+// Mobile touch improvements
+function addMobileTouchSupport() {
+  // Prevent double-tap zoom on buttons
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach(btn => {
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+    }, { passive: false });
+  });
+  
+  // Prevent zoom on input elements
+  const inputs = document.querySelectorAll('input');
+  inputs.forEach(input => {
+    input.addEventListener('touchstart', e => {
+      e.preventDefault();
+    }, { passive: false });
   });
 }
 
@@ -962,6 +1017,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const loaded = loadGame();
   initStarfield();
   renderCurrentScreen();
+  addMobileTouchSupport();
   if (musicEnabled) playMusic();
   if (loaded) {
     console.log('Previous save found and loaded');

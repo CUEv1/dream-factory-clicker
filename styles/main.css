@@ -263,11 +263,151 @@ body {
   cursor: default;
   box-shadow: none;
 }
+/* Mobile Responsive Design */
 @media (max-width: 700px) {
   .generators-screen { max-width: 98vw; }
   .generator-card { flex-direction: column; align-items: flex-start; gap: 0.7em; }
   .gen-icon { margin-right: 0; }
   .gen-info { text-align: left; width: 100%; }
+}
+
+/* iPhone and Mobile Specific Styles */
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+  
+  #app-root {
+    padding: 0.5rem;
+  }
+  
+  .nav-tabs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .nav-btn {
+    font-size: 0.9rem;
+    padding: 0.5em 1em;
+    flex: 1;
+    min-width: 80px;
+  }
+  
+  #dream-orb {
+    width: 120px;
+    height: 120px;
+  }
+  
+  #energy-counter {
+    font-size: 1.8rem;
+  }
+  
+  .main-orb-screen {
+    padding: 1.5rem 1rem;
+    margin: 1rem auto;
+  }
+  
+  .generators-screen, .lucidity-screen, .settings-screen, .statistics-screen {
+    padding: 1.5rem 1rem;
+    margin: 1rem auto;
+    max-width: 95vw;
+  }
+  
+  .generator-card {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .gen-name {
+    font-size: 1.1em;
+  }
+  
+  .gen-buy-btn, .gen-upg-btn {
+    font-size: 0.9em;
+    padding: 0.4em 1em;
+    margin: 0.1em 0.3em 0.1em 0;
+  }
+  
+  .stat-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+  }
+  
+  .stat-card .stat-value {
+    font-size: 1.3rem;
+  }
+  
+  .setting-item {
+    padding: 0.8rem;
+  }
+  
+  .volume-control {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  .volume-label {
+    font-size: 0.9em;
+  }
+  
+  .mute-btn {
+    font-size: 0.8em;
+    padding: 0.3em 0.8em;
+  }
+}
+
+/* iPhone SE and smaller screens */
+@media (max-width: 375px) {
+  #dream-orb {
+    width: 100px;
+    height: 100px;
+  }
+  
+  #energy-counter {
+    font-size: 1.5rem;
+  }
+  
+  .nav-btn {
+    font-size: 0.8rem;
+    padding: 0.4em 0.8em;
+  }
+  
+  .generator-card {
+    padding: 0.8rem;
+  }
+  
+  .gen-buy-btn, .gen-upg-btn {
+    font-size: 0.8em;
+    padding: 0.3em 0.8em;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 700px) and (orientation: landscape) {
+  #dream-orb {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .main-orb-screen {
+    padding: 1rem;
+    margin: 0.5rem auto;
+  }
+  
+  .nav-tabs {
+    margin-bottom: 0.5rem;
+  }
+  
+  .generators-screen, .lucidity-screen, .settings-screen, .statistics-screen {
+    padding: 1rem;
+    margin: 0.5rem auto;
+  }
 } 
 
 .lucidity-screen {
