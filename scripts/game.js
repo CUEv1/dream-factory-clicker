@@ -141,9 +141,8 @@ function prestige() {
     }
   });
 
-  // Clear previous save to ensure no old data is reloaded
-  safeSetItem(SAVE_KEY, '');
-  saveGame(); // Save the reset state immediately after prestige
+  // Save the reset state
+  saveGame();
 
   updateEnergyCounter();
   renderCurrentScreen();
@@ -574,7 +573,7 @@ function purchaseUpgrade(upgradeId) {
   
   updateEnergyCounter();
   renderCurrentScreen();
-  playSound('upgrade');
+  playSound('purchase'); // FIX: Add sound effect
 }
 
 // --- Upgrades Screen ---
@@ -951,19 +950,34 @@ let starfieldSpeed = 1; // 1 = normal, 2 = double speed
 
 function playSound(name) {
   if (soundEnabled && SOUNDS[name]) {
-    SOUNDS[name].currentTime = 0;
-    // Apply appropriate volume based on sound type
-    if (name === 'ambient') {
-      SOUNDS[name].volume = musicVolume;
-    } else if (name === 'menu') {
-      SOUNDS[name].volume = menuVolume;
-    } else if (name === 'prestige') {
-      SOUNDS[name].volume = soundVolume * 0.25; // 25% of SFX volume
-    } else {
-      SOUNDS[name].volume = soundVolume;
+    try {
+      SOUNDS[name].currentTime = 0;
+      // Apply appropriate volume based on sound type
+      if (name === 'ambient') {
+        SOUNDS[name].volume = musicVolume;
+      } else if (name === 'menu') {
+        SOUNDS[name].volume = menuVolume;
+      } else if (name === 'prestige') {
+        SOUNDS[name].volume = soundVolume * 0.25; // 25% of SFX volume
+      } else {
+        SOUNDS[name].volume = soundVolume;
+      }
+      SOUNDS[name].play().catch(e => {
+        console.warn(`Could not play sound ${name}:`, e);
+      });
+    } catch (e) {
+      console.warn(`Error playing sound ${name}:`, e);
     }
-    SOUNDS[name].play();
   }
+}
+
+function initializeAudio() {
+  // Check if audio files exist and handle gracefully
+  Object.keys(SOUNDS).forEach(soundName => {
+    SOUNDS[soundName].addEventListener('error', () => {
+      console.warn(`Audio file for ${soundName} could not be loaded`);
+    });
+  });
 }
 
 function playMusic() {
@@ -1025,21 +1039,6 @@ function upgradeGenerator(id) {
     updateGeneratorsDisplay();
     playSound('purchase');
   }
-}
-// Play prestige sound
-function prestige() {
-  if (!canPrestige()) return;
-  const lucidityGain = calculateLucidityGain();
-  lucidityPoints += lucidityGain;
-  totalPrestiges++;
-  gameStats.totalPrestiges++;
-  dreamEnergy = 0;
-  GENERATORS.forEach(gen => {
-    generatorState[gen.id] = { count: 0, level: 1 };
-  });
-  updateEnergyCounter();
-  renderCurrentScreen();
-  playSound('prestige');
 }
 
 // --- Game Statistics ---
@@ -1171,7 +1170,6 @@ function renderSettingsScreen() {
             <span class="volume-label">Menu Sounds:</span>
             <input type="range" id="menu-volume" min="0" max="1" step="0.1" value="${menuVolume}" />
             <span class="volume-display">${Math.round(menuVolume * 100)}%</span>
-            <button class="mute-btn" id="menu-mute">Mute</button>
           </div>
         </div>
         <div class="setting-item">
@@ -1217,64 +1215,73 @@ function renderSettingsScreen() {
   `;
   
   // Volume slider event listeners
-  document.getElementById('sound-volume').addEventListener('input', e => {
-    const volume = parseFloat(e.target.value);
-    updateSoundVolume(volume);
-    e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
-    saveGame(); // Save immediately when volume changes
-  });
-  
-  document.getElementById('music-volume').addEventListener('input', e => {
-    const volume = parseFloat(e.target.value);
-    updateMusicVolume(volume);
-    e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
-    saveGame(); // Save immediately when volume changes
-  });
-  
-  document.getElementById('menu-volume').addEventListener('input', e => {
-    const volume = parseFloat(e.target.value);
-    updateMenuVolume(volume);
-    e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
-    saveGame(); // Save immediately when volume changes
-  });
+  const soundVolumeSlider = document.getElementById('sound-volume');
+  const musicVolumeSlider = document.getElementById('music-volume');
+  const menuVolumeSlider = document.getElementById('menu-volume');
+  const starfieldSpeedSlider = document.getElementById('starfield-speed');
 
-  // Starfield speed slider event listener
-  document.getElementById('starfield-speed').addEventListener('input', e => {
-    starfieldSpeed = parseFloat(e.target.value);
-    document.getElementById('starfield-speed-display').textContent = Math.round((starfieldSpeed - 1) * 100) + '%';
-    saveGame();
-  });
+  if (soundVolumeSlider) {
+    soundVolumeSlider.addEventListener('input', e => {
+      const volume = parseFloat(e.target.value);
+      updateSoundVolume(volume);
+      e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
+      saveGame(); // Save immediately when volume changes
+    });
+  }
+
+  if (musicVolumeSlider) {
+    musicVolumeSlider.addEventListener('input', e => {
+      const volume = parseFloat(e.target.value);
+      updateMusicVolume(volume);
+      e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
+      saveGame(); // Save immediately when volume changes
+    });
+  }
+
+  if (menuVolumeSlider) {
+    menuVolumeSlider.addEventListener('input', e => {
+      const volume = parseFloat(e.target.value);
+      updateMenuVolume(volume);
+      e.target.nextElementSibling.textContent = Math.round(volume * 100) + '%';
+      saveGame(); // Save immediately when volume changes
+    });
+  }
+
+  if (starfieldSpeedSlider) {
+    starfieldSpeedSlider.addEventListener('input', e => {
+      starfieldSpeed = parseFloat(e.target.value);
+      const display = document.getElementById('starfield-speed-display');
+      if (display) {
+        display.textContent = Math.round((starfieldSpeed - 1) * 100) + '%';
+      }
+      saveGame();
+    });
+  }
   
   // Mute button event listeners
-  document.getElementById('sound-mute').addEventListener('click', e => {
-    soundEnabled = !soundEnabled;
-    e.target.textContent = soundEnabled ? 'Mute' : 'Unmute';
-    e.target.classList.toggle('muted', !soundEnabled);
-    if (soundEnabled) playSound('click');
-    saveGame(); // Save immediately when mute state changes
-  });
-  
-  document.getElementById('music-mute').addEventListener('click', e => {
-    musicEnabled = !musicEnabled;
-    e.target.textContent = musicEnabled ? 'Mute' : 'Unmute';
-    e.target.classList.toggle('muted', !musicEnabled);
-    if (musicEnabled) playMusic();
-    else stopMusic();
-    saveGame(); // Save immediately when mute state changes
-  });
-  
-  document.getElementById('menu-mute').addEventListener('click', e => {
-    const menuMuted = e.target.classList.contains('muted');
-    e.target.textContent = menuMuted ? 'Mute' : 'Unmute';
-    e.target.classList.toggle('muted', !menuMuted);
-    // Toggle menu sound by setting volume to 0 when muted
-    if (menuMuted) {
-      updateMenuVolume(menuVolume);
-    } else {
-      updateMenuVolume(0);
-    }
-    saveGame(); // Save immediately when mute state changes
-  });
+  const soundMuteBtn = document.getElementById('sound-mute');
+  const musicMuteBtn = document.getElementById('music-mute');
+
+  if (soundMuteBtn) {
+    soundMuteBtn.addEventListener('click', e => {
+      soundEnabled = !soundEnabled;
+      e.target.textContent = soundEnabled ? 'Mute' : 'Unmute';
+      e.target.classList.toggle('muted', !soundEnabled);
+      if (soundEnabled) playSound('click');
+      saveGame(); // Save immediately when mute state changes
+    });
+  }
+
+  if (musicMuteBtn) {
+    musicMuteBtn.addEventListener('click', e => {
+      musicEnabled = !musicEnabled;
+      e.target.textContent = musicEnabled ? 'Mute' : 'Unmute';
+      e.target.classList.toggle('muted', !musicEnabled);
+      if (musicEnabled) playMusic();
+      else stopMusic();
+      saveGame(); // Save immediately when mute state changes
+    });
+  }
 }
 
 // --- Keyboard Accessibility for Orb ---
@@ -1337,6 +1344,7 @@ function addMobileTouchSupport() {
 
 // Start music on load if enabled
 window.addEventListener('DOMContentLoaded', () => {
+  initializeAudio();
   const loaded = loadGame();
   initStarfield();
   renderCurrentScreen();
