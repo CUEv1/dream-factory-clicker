@@ -197,30 +197,7 @@ function totalGeneratorProduction() {
   return GENERATORS.reduce((sum, gen) => sum + getGeneratorProduction(gen.id), 0);
 }
 
-function purchaseGenerator(id) {
-  const cost = getGeneratorCost(id);
-  if (dreamEnergy >= cost) {
-    dreamEnergy -= cost;
-    generatorState[id].count++;
-    updateEnergyCounter();
-    renderGeneratorsScreen();
-    // TODO: Play purchase sound
-  }
-}
 
-function upgradeGenerator(id) {
-  const gen = GENERATORS.find(g => g.id === id);
-  const state = generatorState[id];
-  // Upgrade cost is higher than purchase cost
-  const upgradeCost = Math.floor(gen.baseCost * 5 * Math.pow(2, state.level));
-  if (dreamEnergy >= upgradeCost && state.level < 10) {
-    dreamEnergy -= upgradeCost;
-    state.level++;
-    updateEnergyCounter();
-    renderGeneratorsScreen();
-    // TODO: Play upgrade sound
-  }
-}
 
 // Auto-production tick
 setInterval(() => {
