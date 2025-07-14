@@ -114,6 +114,9 @@ function canPrestige() {
 function prestige() {
   if (!canPrestige()) return;
 
+  // Debug log
+  console.log('[DEBUG] Prestige function called.');
+
   // Show warning confirmation
   const confirmed = confirm('Are you sure? Prestiging will reset ALL Dream Energy, Generators, and Upgrades, but you\'ll gain Lucidity Points for permanent bonuses.');
   if (!confirmed) return;
