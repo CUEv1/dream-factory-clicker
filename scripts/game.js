@@ -130,7 +130,12 @@ function prestige() {
   GENERATORS.forEach(gen => {
     generatorState[gen.id] = { count: 0, level: 1 };
   });
+  // Reset all clicker upgrades to initial state
   clickerUpgrades = { clickValue: 1, clickValueLevel: 0 };
+  // Reset all upgrade levels for each upgrade in CLICKER_UPGRADES
+  CLICKER_UPGRADES.forEach(upg => {
+    clickerUpgrades[upg.id + 'Level'] = 0;
+  });
 
   updateEnergyCounter();
   renderCurrentScreen();
