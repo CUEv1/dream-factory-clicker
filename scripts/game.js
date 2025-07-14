@@ -137,6 +137,8 @@ function prestige() {
     clickerUpgrades[upg.id + 'Level'] = 0;
   });
 
+  // Clear previous save to ensure no old data is reloaded
+  safeSetItem(SAVE_KEY, '');
   saveGame(); // Save the reset state immediately after prestige
 
   updateEnergyCounter();
