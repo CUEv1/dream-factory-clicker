@@ -125,7 +125,10 @@ function onOrbClick(e) {
 }
 
 function updateEnergyCounter() {
-  document.getElementById('energy-counter').innerHTML = `${dreamEnergy.toLocaleString()} <span class="energy-unit">Dream Energy</span>`;
+  const energyCounter = document.getElementById('energy-counter');
+  if (energyCounter) {
+    energyCounter.innerHTML = `${dreamEnergy.toLocaleString()} <span class="energy-unit">Dream Energy</span>`;
+  }
 }
 
 function showFloatingNumber(e, value = 1) {
@@ -663,37 +666,27 @@ function updateMenuVolume(volume) {
 // --- Integrate sounds into game actions ---
 // Play purchase/upgrade sound
 function purchaseGenerator(id) {
-  console.log('purchaseGenerator called with id:', id);
   const cost = getGeneratorCost(id);
-  console.log('Cost:', cost, 'Current energy:', dreamEnergy);
   if (dreamEnergy >= cost) {
     dreamEnergy -= cost;
     generatorState[id].count++;
     gameStats.generatorsPurchased++;
-    console.log('Purchase successful! New count for', id, ':', generatorState[id].count);
     updateEnergyCounter();
     renderGeneratorsScreen();
     playSound('purchase');
-  } else {
-    console.log('Not enough energy for purchase');
   }
 }
 function upgradeGenerator(id) {
-  console.log('upgradeGenerator called with id:', id);
   const gen = GENERATORS.find(g => g.id === id);
   const state = generatorState[id];
   const upgradeCost = Math.floor(gen.baseCost * 5 * Math.pow(2, state.level));
-  console.log('Upgrade cost:', upgradeCost, 'Current energy:', dreamEnergy, 'Current level:', state.level);
   if (dreamEnergy >= upgradeCost && state.level < 10) {
     dreamEnergy -= upgradeCost;
     state.level++;
     gameStats.upgradesPurchased++;
-    console.log('Upgrade successful! New level for', id, ':', state.level);
     updateEnergyCounter();
     renderGeneratorsScreen();
     playSound('purchase');
-  } else {
-    console.log('Cannot upgrade - not enough energy or max level reached');
   }
 }
 // Play prestige sound
