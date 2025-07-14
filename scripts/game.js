@@ -67,18 +67,7 @@ window.addEventListener('resize', initStarfield);
 // --- Dream Orb Clicker Implementation ---
 let dreamEnergy = 0;
 
-function renderMainScreen() {
-  const app = document.getElementById('app-root');
-  app.innerHTML = `
-    <div class="main-orb-screen glass">
-      <div id="energy-counter">${dreamEnergy.toLocaleString()} <span class="energy-unit">Dream Energy</span></div>
-      <div id="dream-orb-container">
-        <div id="dream-orb" tabindex="0" title="Tap to collect dream energy!"></div>
-      </div>
-    </div>
-  `;
-  document.getElementById('dream-orb').addEventListener('click', onOrbClick);
-}
+
 
 // --- Prestige (Lucidity) System ---
 let lucidityPoints = 0;
@@ -505,7 +494,11 @@ function renderMainScreen() {
       </div>
     </div>
   `;
-  document.getElementById('dream-orb').addEventListener('click', onOrbClick);
+  // Add click event listener to the orb
+  const orb = document.getElementById('dream-orb');
+  if (orb) {
+    orb.addEventListener('click', onOrbClick);
+  }
 }
 
 // --- Save/Load System ---
@@ -518,6 +511,7 @@ function saveGame() {
     lucidityPoints,
     totalPrestiges,
     generatorState,
+    gameStats,
     lastSaveTime: Date.now()
   };
   
@@ -539,6 +533,7 @@ function loadGame() {
       lucidityPoints = saveData.lucidityPoints || 0;
       totalPrestiges = saveData.totalPrestiges || 0;
       generatorState = saveData.generatorState || {};
+      gameStats = saveData.gameStats || gameStats;
       
       // Ensure all generators exist in state
       GENERATORS.forEach(gen => {
@@ -562,6 +557,7 @@ function exportSaveData() {
     lucidityPoints,
     totalPrestiges,
     generatorState,
+    gameStats,
     exportTime: Date.now()
   };
   return btoa(JSON.stringify(saveData)); // Base64 encode
@@ -575,6 +571,7 @@ function importSaveData(importString) {
     lucidityPoints = saveData.lucidityPoints || 0;
     totalPrestiges = saveData.totalPrestiges || 0;
     generatorState = saveData.generatorState || {};
+    gameStats = saveData.gameStats || gameStats;
     
     // Ensure all generators exist in state
     GENERATORS.forEach(gen => {
@@ -598,6 +595,15 @@ function resetGame() {
     dreamEnergy = 0;
     lucidityPoints = 0;
     totalPrestiges = 0;
+    gameStats = {
+      totalClicks: 0,
+      totalEnergyEarned: 0,
+      timePlayed: 0,
+      totalPrestiges: 0,
+      generatorsPurchased: 0,
+      upgradesPurchased: 0,
+      startTime: Date.now()
+    };
     GENERATORS.forEach(gen => {
       generatorState[gen.id] = { count: 0, level: 1 };
     });
@@ -717,6 +723,33 @@ function prestige() {
   updateEnergyCounter();
   renderCurrentScreen();
   playSound('prestige');
+}
+
+// --- Game Statistics ---
+let gameStats = {
+  totalClicks: 0,
+  totalEnergyEarned: 0,
+  timePlayed: 0,
+  totalPrestiges: 0,
+  generatorsPurchased: 0,
+  upgradesPurchased: 0,
+  startTime: Date.now()
+};
+
+function updateStats() {
+  gameStats.timePlayed = Date.now() - gameStats.startTime;
+}
+
+function formatTime(ms) {
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  
+  if (days > 0) return `${days}d ${hours % 24}h ${minutes % 60}m`;
+  if (hours > 0) return `${hours}h ${minutes % 60}m`;
+  if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+  return `${seconds}s`;
 }
 
 // --- Statistics Screen ---
