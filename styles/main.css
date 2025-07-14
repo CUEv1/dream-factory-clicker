@@ -11,14 +11,21 @@
   font-style: normal;
 }
 
+:root {
+  --main-bg: #18182a;
+  --main-fg: #f3eaff;
+  --accent: #e0b3ff;
+  --accent2: #a7c7ff;
+}
+
 body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
   font-family: 'Comfortaa', Arial, sans-serif;
-  background: #18182a;
+  background: var(--main-bg);
   overflow-x: hidden;
-  color: #f3eaff;
+  color: var(--main-fg);
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -892,7 +899,7 @@ body {
 .mute-btn.muted {
   background: linear-gradient(45deg, #666, #999);
   color: #fff;
-  box-shadow: 0 2px 8px #66644;
+  box-shadow: 0 2px 8px #666444;
 }
 
 .volume-control {
@@ -1158,4 +1165,22 @@ body {
   .stat-grid { grid-template-columns: 1fr; }
   .stat-card { padding: 1.2rem; }
   .stat-card .stat-value { font-size: 1.5rem; }
+} 
+
+/* Focus styles for accessibility */
+button:focus-visible, .nav-btn:focus-visible, .gen-buy-btn:focus-visible, .gen-upg-btn:focus-visible, .upgrade-btn:focus-visible, #dream-orb:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--accent2);
+  z-index: 10;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 } 

@@ -214,19 +214,24 @@ function updateEnergyCounter() {
   }
 }
 
-function showFloatingNumber(e, value = 1) {
-  const orb = document.getElementById('dream-orb');
-  const num = document.createElement('div');
-  num.className = 'floating-number';
-  num.textContent = `+${value}`;
-  orb.appendChild(num);
-  setTimeout(() => {
-    num.style.transform = 'translateY(-40px) scale(1.2)';
-    num.style.opacity = '0';
-  }, 10);
-  setTimeout(() => {
-    num.remove();
-  }, 900);
+// --- Utility: Reduced Motion Support ---
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// --- Utility: Safe localStorage ---
+function safeSetItem(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    console.warn('Could not save to localStorage:', e);
+  }
+}
+function safeGetItem(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    console.warn('Could not read from localStorage:', e);
+    return null;
+  }
 }
 
 // --- Generator System ---
@@ -750,6 +755,7 @@ function renderMainScreen() {
   const orb = document.getElementById('dream-orb');
   if (orb) {
     orb.addEventListener('click', onOrbClick);
+    addOrbAccessibility(); // Call this after the orb is rendered
   }
 }
 
@@ -775,7 +781,7 @@ function saveGame() {
   };
   
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+    safeSetItem(SAVE_KEY, JSON.stringify(saveData));
     console.log('Game saved successfully');
   } catch (error) {
     console.error('Failed to save game:', error);
@@ -784,7 +790,7 @@ function saveGame() {
 
 function loadGame() {
   try {
-    const saveString = localStorage.getItem(SAVE_KEY);
+    const saveString = safeGetItem(SAVE_KEY);
     if (saveString) {
       const saveData = JSON.parse(saveString);
       
@@ -899,7 +905,7 @@ function resetGame() {
     GENERATORS.forEach(gen => {
       generatorState[gen.id] = { count: 0, level: 1 };
     });
-    localStorage.removeItem(SAVE_KEY);
+    safeSetItem(SAVE_KEY, ''); // Clear saved data
     updateEnergyCounter();
     renderCurrentScreen();
     console.log('Game reset successfully');
@@ -1256,6 +1262,43 @@ function renderSettingsScreen() {
     }
     saveGame(); // Save immediately when mute state changes
   });
+}
+
+// --- Keyboard Accessibility for Orb ---
+function addOrbAccessibility() {
+  const orb = document.getElementById('dream-orb');
+  if (orb) {
+    orb.setAttribute('tabindex', '0');
+    orb.setAttribute('role', 'button');
+    orb.setAttribute('aria-label', 'Dream Orb: Click or press Space/Enter to gain energy');
+    orb.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        onOrbClick(e);
+      }
+    });
+  }
+}
+
+// --- Add ARIA attributes to dynamic elements where relevant (e.g., floating numbers, buttons) ---
+function showFloatingNumber(e, value = 1) {
+  const orb = document.getElementById('dream-orb');
+  const num = document.createElement('div');
+  num.className = 'floating-number';
+  num.textContent = `+${value}`;
+  num.setAttribute('aria-live', 'polite');
+  orb.appendChild(num);
+  if (!prefersReducedMotion) {
+    setTimeout(() => {
+      num.style.transform = `translateY(-${FLOATING_NUMBER_ANIMATION_DISTANCE}px) scale(1.2)`;
+      num.style.opacity = '0';
+    }, 10);
+    setTimeout(() => {
+      num.remove();
+    }, FLOATING_NUMBER_ANIMATION_DURATION);
+  } else {
+    setTimeout(() => num.remove(), 300);
+  }
 }
 
 // Mobile touch improvements

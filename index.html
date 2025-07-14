@@ -5,14 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Dream Factory Clicker: Build your dream factory, earn energy, and unlock upgrades in this idle clicker game!">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
   <title>Dream Factory Clicker</title>
   <link rel="stylesheet" href="styles/main.css">
   <link rel="preload" href="assets/fonts/Orbitron.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="assets/fonts/Comfortaa.ttf" as="font" type="font/ttf" crossorigin>
 </head>
 <body>
-  <div id="starfield"></div>
-  <div id="app-root"></div>
+  <noscript><div style="color: #fff; background: #900; padding: 1em; text-align: center;">JavaScript is required to play Dream Factory Clicker. Please enable JavaScript in your browser.</div></noscript>
+  <div id="starfield" aria-hidden="true"></div>
+  <div id="app-root" role="main"></div>
   <script src="scripts/game.js"></script>
 </body>
 </html> 
