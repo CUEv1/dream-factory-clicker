@@ -250,6 +250,7 @@ function renderNavigation() {
     <button class="nav-btn" data-tab="main" ${currentScreen==='main'?'disabled':''}>Main Orb</button>
     <button class="nav-btn" data-tab="generators" ${currentScreen==='generators'?'disabled':''}>Generators</button>
     <button class="nav-btn" data-tab="lucidity" ${currentScreen==='lucidity'?'disabled':''}>Lucidity</button>
+    <button class="nav-btn" data-tab="stats" ${currentScreen==='stats'?'disabled':''}>Stats</button>
     <button class="nav-btn" data-tab="settings" ${currentScreen==='settings'?'disabled':''}>Settings</button>
   </div>`;
   app.insertAdjacentHTML('afterbegin', nav);
@@ -271,6 +272,8 @@ function renderCurrentScreen() {
     renderGeneratorsScreen();
   } else if (currentScreen === 'lucidity') {
     renderLucidityScreen();
+  } else if (currentScreen === 'stats') {
+    renderStatisticsScreen();
   } else if (currentScreen === 'settings') {
     renderSettingsScreen();
   }
@@ -278,6 +281,50 @@ function renderCurrentScreen() {
 }
 
 // --- Generators Screen ---
+// --- Animated Generator Graphics ---
+const GENERATOR_ANIMATIONS = {
+  'lucid-loom': {
+    svg: `<svg class="gen-animation" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="40" fill="none" stroke="#b3aaff" stroke-width="3" class="outer-ring"/>
+      <circle cx="50" cy="50" r="25" fill="none" stroke="#e0b3ff" stroke-width="2" class="inner-ring"/>
+      <circle cx="50" cy="50" r="8" fill="#b3aaff" class="center-dot"/>
+      <g class="gear-group">
+        <circle cx="30" cy="30" r="8" fill="none" stroke="#b3aaff" stroke-width="2" class="gear"/>
+        <circle cx="70" cy="30" r="8" fill="none" stroke="#b3aaff" stroke-width="2" class="gear"/>
+        <circle cx="30" cy="70" r="8" fill="none" stroke="#b3aaff" stroke-width="2" class="gear"/>
+        <circle cx="70" cy="70" r="8" fill="none" stroke="#b3aaff" stroke-width="2" class="gear"/>
+      </g>
+    </svg>`,
+    class: 'lucid-animation'
+  },
+  'nightmare-forge': {
+    svg: `<svg class="gen-animation" viewBox="0 0 100 100">
+      <rect x="30" y="40" width="40" height="20" fill="none" stroke="#ff7fae" stroke-width="3" class="forge-frame"/>
+      <circle cx="50" cy="50" r="15" fill="none" stroke="#ff7fae" stroke-width="2" class="fire-ring"/>
+      <g class="flame-group">
+        <path d="M45 45 L50 35 L55 45" fill="#ff7fae" class="flame"/>
+        <path d="M40 50 L45 40 L50 50" fill="#ffb3d9" class="flame"/>
+        <path d="M50 50 L55 40 L60 50" fill="#ffb3d9" class="flame"/>
+      </g>
+    </svg>`,
+    class: 'nightmare-animation'
+  },
+  'starlight-siphon': {
+    svg: `<svg class="gen-animation" viewBox="0 0 100 100">
+      <polygon points="50,20 60,40 80,40 65,55 70,75 50,65 30,75 35,55 20,40 40,40" fill="none" stroke="#7fffd4" stroke-width="2" class="star"/>
+      <circle cx="50" cy="50" r="30" fill="none" stroke="#7fffd4" stroke-width="1" stroke-dasharray="5,5" class="orbit-ring"/>
+      <g class="particle-group">
+        <circle cx="20" cy="30" r="2" fill="#7fffd4" class="particle"/>
+        <circle cx="80" cy="70" r="2" fill="#7fffd4" class="particle"/>
+        <circle cx="30" cy="80" r="2" fill="#7fffd4" class="particle"/>
+        <circle cx="70" cy="20" r="2" fill="#7fffd4" class="particle"/>
+      </g>
+    </svg>`,
+    class: 'starlight-animation'
+  }
+};
+
+// Update generator rendering to include animations
 function renderGeneratorsScreen() {
   const app = document.getElementById('app-root');
   app.innerHTML = `
@@ -286,8 +333,11 @@ function renderGeneratorsScreen() {
       <div class="generator-list">
         ${GENERATORS.map(gen => {
           const state = generatorState[gen.id];
-          return `<div class="generator-card" style="--gen-color:${gen.color}">
-            <div class="gen-icon">${gen.icon}</div>
+          const animation = GENERATOR_ANIMATIONS[gen.id];
+          return `<div class="generator-card ${animation.class}" style="--gen-color:${gen.color}">
+            <div class="gen-animation-container">
+              ${animation.svg}
+            </div>
             <div class="gen-info">
               <div class="gen-name">${gen.name}</div>
               <div class="gen-desc">${gen.description}</div>
@@ -630,6 +680,8 @@ function updateMenuVolume(volume) {
 function onOrbClick(e) {
   const clickValue = Math.floor(1 * getLucidityMultiplier());
   dreamEnergy += clickValue;
+  gameStats.totalClicks++;
+  gameStats.totalEnergyEarned += clickValue;
   updateEnergyCounter();
   showFloatingNumber(e, clickValue);
   playSound('click');
@@ -641,6 +693,7 @@ function purchaseGenerator(id) {
   if (dreamEnergy >= cost) {
     dreamEnergy -= cost;
     generatorState[id].count++;
+    gameStats.generatorsPurchased++;
     updateEnergyCounter();
     renderGeneratorsScreen();
     playSound('purchase');
@@ -653,6 +706,7 @@ function upgradeGenerator(id) {
   if (dreamEnergy >= upgradeCost && state.level < 10) {
     dreamEnergy -= upgradeCost;
     state.level++;
+    gameStats.upgradesPurchased++;
     updateEnergyCounter();
     renderGeneratorsScreen();
     playSound('purchase');
@@ -664,6 +718,7 @@ function prestige() {
   const lucidityGain = calculateLucidityGain();
   lucidityPoints += lucidityGain;
   totalPrestiges++;
+  gameStats.totalPrestiges++;
   dreamEnergy = 0;
   GENERATORS.forEach(gen => {
     generatorState[gen.id] = { count: 0, level: 1 };
@@ -671,6 +726,75 @@ function prestige() {
   updateEnergyCounter();
   renderCurrentScreen();
   playSound('prestige');
+}
+
+// --- Statistics Screen ---
+function renderStatisticsScreen() {
+  updateStats();
+  const app = document.getElementById('app-root');
+  app.innerHTML = `
+    <div class="statistics-screen glass">
+      <h2>Statistics</h2>
+      
+      <div class="stats-section">
+        <h3>Game Progress</h3>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-value">${gameStats.totalClicks.toLocaleString()}</div>
+            <div class="stat-label">Total Clicks</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${gameStats.totalEnergyEarned.toLocaleString()}</div>
+            <div class="stat-label">Energy Earned</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${formatTime(gameStats.timePlayed)}</div>
+            <div class="stat-label">Time Played</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${gameStats.totalPrestiges}</div>
+            <div class="stat-label">Prestiges</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stats-section">
+        <h3>Purchases</h3>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-value">${gameStats.generatorsPurchased}</div>
+            <div class="stat-label">Generators Bought</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${gameStats.upgradesPurchased}</div>
+            <div class="stat-label">Upgrades Bought</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stats-section">
+        <h3>Current Status</h3>
+        <div class="stat-list">
+          <div class="stat-item">
+            <span class="stat-label">Current Energy:</span>
+            <span class="stat-value">${dreamEnergy.toLocaleString()}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Lucidity Points:</span>
+            <span class="stat-value">${lucidityPoints}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Click Multiplier:</span>
+            <span class="stat-value">${getLucidityMultiplier().toFixed(1)}x</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Total Production:</span>
+            <span class="stat-value">${totalGeneratorProduction().toFixed(2)}/sec</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 // --- Settings Screen: Add sound/music toggles and volume sliders ---

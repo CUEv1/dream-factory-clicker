@@ -625,3 +625,234 @@ body {
   .settings-screen { max-width: 98vw; }
   .setting-item { padding: 0.8rem; }
 } 
+
+.gen-animation-container {
+  width: 80px;
+  height: 80px;
+  margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gen-animation {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 8px var(--gen-color, #a7c7ff));
+}
+
+/* Lucid Loom Animations */
+.lucid-animation .outer-ring {
+  animation: rotate 8s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+.lucid-animation .inner-ring {
+  animation: rotate 6s linear infinite reverse;
+  transform-origin: 50% 50%;
+}
+
+.lucid-animation .gear {
+  animation: rotate 4s linear infinite;
+  transform-origin: center;
+}
+
+.lucid-animation .center-dot {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Nightmare Forge Animations */
+.nightmare-animation .forge-frame {
+  animation: flicker 0.5s ease-in-out infinite alternate;
+}
+
+.nightmare-animation .fire-ring {
+  animation: rotate 3s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+.nightmare-animation .flame {
+  animation: flicker 0.3s ease-in-out infinite alternate;
+}
+
+.nightmare-animation .flame:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.nightmare-animation .flame:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+/* Starlight Siphon Animations */
+.starlight-animation .star {
+  animation: rotate 10s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+.starlight-animation .orbit-ring {
+  animation: rotate 15s linear infinite reverse;
+  transform-origin: 50% 50%;
+}
+
+.starlight-animation .particle {
+  animation: float 4s ease-in-out infinite;
+}
+
+.starlight-animation .particle:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.starlight-animation .particle:nth-child(3) {
+  animation-delay: 2s;
+}
+
+.starlight-animation .particle:nth-child(4) {
+  animation-delay: 3s;
+}
+
+/* Animation Keyframes */
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+@keyframes flicker {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) scale(1); opacity: 0.7; }
+  50% { transform: translateY(-10px) scale(1.2); opacity: 1; }
+}
+
+/* Prestige particle effects */
+.prestige-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.prestige-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: linear-gradient(45deg, #e0b3ff, #b3aaff);
+  border-radius: 50%;
+  animation: prestigeFloat 3s ease-out forwards;
+}
+
+@keyframes prestigeFloat {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) scale(0);
+    opacity: 0;
+  }
+} 
+
+.statistics-screen {
+  padding: 2.5rem 2rem 2rem 2rem;
+  max-width: 700px;
+  margin: 3rem auto;
+  text-align: center;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.27);
+}
+
+.stats-section {
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.stats-section h3 {
+  color: #e0b3ff;
+  text-shadow: 0 0 8px #e0b3ff44;
+  margin-bottom: 1.5rem;
+  font-family: 'Orbitron', 'Comfortaa', Arial, sans-serif;
+  text-align: center;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: rgba(60, 40, 100, 0.25);
+  border-radius: 1.2em;
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.2);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(31, 38, 135, 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.stat-card .stat-value {
+  font-family: 'Orbitron', 'Comfortaa', Arial, sans-serif;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #e0b3ff;
+  text-shadow: 0 0 12px #e0b3ff44;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card .stat-label {
+  font-size: 0.9em;
+  color: #fff8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stat-list .stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: rgba(60, 40, 100, 0.25);
+  border-radius: 1em;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-list .stat-label {
+  font-size: 0.95em;
+  opacity: 0.8;
+}
+
+.stat-list .stat-value {
+  font-family: 'Orbitron', 'Comfortaa', Arial, sans-serif;
+  font-weight: bold;
+  color: #e0b3ff;
+  text-shadow: 0 0 8px #e0b3ff44;
+}
+
+@media (max-width: 700px) {
+  .statistics-screen { max-width: 98vw; }
+  .stat-grid { grid-template-columns: 1fr; }
+  .stat-card { padding: 1.2rem; }
+  .stat-card .stat-value { font-size: 1.5rem; }
+} 
