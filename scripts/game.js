@@ -23,7 +23,7 @@ Dream Factory Clicker - TODO Roadmap
 
 // Starfield animation
 const starfield = document.getElementById('starfield');
-const STAR_COUNT = 120;
+const STAR_COUNT = 80; // Reduced star count for less visual complexity
 let stars = [];
 
 function createStar() {
@@ -40,7 +40,7 @@ function createStar() {
   star.style.borderRadius = '50%';
   star.style.boxShadow = `0 0 ${size * 8}px #a7c7ff88`;
   starfield.appendChild(star);
-  return {el: star, speed: Math.random() * 0.2 + 0.05};
+  return {el: star, speed: Math.random() * 0.05 + 0.01}; // Much slower speeds
 }
 
 function animateStars() {
@@ -50,7 +50,8 @@ function animateStars() {
     if (top > 100) top = 0;
     s.el.style.top = `${top}%`;
   }
-  requestAnimationFrame(animateStars);
+  // Slow down the animation frame rate for gentler movement
+  setTimeout(() => requestAnimationFrame(animateStars), 50); // 20 FPS instead of 60 FPS
 }
 
 function initStarfield() {
